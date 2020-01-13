@@ -1,0 +1,24 @@
+
+.OrdersSummary {
+
+}
+
+.OrdersSummary .restaurantBox{
+	border-radius: 20px;
+	padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+    font-size: large;
+
+    cursor: pointer;
+}
+
+.OrdersSummary .restaurantBox span {
+	display: block;
+    width: 40px;
+    background-color: #00a731;
+    margin: auto;
+    color: white;
+    border-radius: 20px;
+}
