@@ -10,7 +10,7 @@ const OrdersSummary = (props) => {
 	if (props.order) {
 		orderSummaryDOM = props.order.restaurantSummary.map((restaurant, index) => {
 			return(
-				<Col md={4} key={index}>
+				<Col md={3} key={index}>
 					<div className="restaurantBox" onClick={() => props.handleClickRestaurant(restaurant.id, restaurant.name)}>
 						{restaurant.name}
 						<span>{restaurant.total}</span>

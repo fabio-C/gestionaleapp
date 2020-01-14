@@ -4,20 +4,20 @@
 }
 
 .OrdersSummary .restaurantBox{
-	border-radius: 20px;
-	padding-top: 15px;
+    border-radius: 5px;
+    padding-top: 15px;
     padding-bottom: 15px;
-    background-color: #f9f9f9;
+    background-color: #18213d;
     margin-bottom: 10px;
     font-size: large;
-
     cursor: pointer;
+    color: white;
 }
 
 .OrdersSummary .restaurantBox span {
 	display: block;
     width: 40px;
-    background-color: #00a731;
+    background-color: #3a506b;
     margin: auto;
     color: white;
     border-radius: 20px;

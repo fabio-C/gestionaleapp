@@ -3,6 +3,7 @@ import { NavLink, Link } from 'react-router-dom';
 
 //Images
 import burgerimg from '../../../assets/images/burger.png';
+import logo from '../../../assets/images/logo.png';
 
 //Style
 import './Topbar.css';
@@ -22,7 +23,7 @@ const topbar = ( props ) => {
             
             <div className="Logo">
                 <Link to="/">
-                    LOGO
+                    <img src={logo} alt="the circle logo"/>
                 </Link>
             </div>
 
@@ -33,8 +34,6 @@ const topbar = ( props ) => {
             <nav>
                 <NavLink to="/" exact activeClassName="active">Ordini</NavLink>
                 <NavLink to="/historical" exact activeClassName="active">Storici</NavLink>
-                <NavLink to="/restaurants" exact activeClassName="active">Ristoranti</NavLink>
-                <NavLink to="/products" exact activeClassName="active">Prodotti</NavLink>
             </nav>
 
         </header>

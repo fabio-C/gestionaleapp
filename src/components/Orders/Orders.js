@@ -13,25 +13,48 @@ class Orders extends Component {
 			order: null,
 			orderid: null,
 
-			restaurant: null, //Used by OrdersDetail
+			startDate: null, //Initial date is today
 
-			startDate: new Date(), //Initial date is today
+			//OrdersDetail state
+			restaurant: null,
+			restaurantid: null,
+			orderEdited: false, //true when change order details
+			orderSaved: false, //true if order change has been saved
 
 			//RENDER FLAG
-			viewOrdersDetail: false //false: show OrdersSummary, true: show OrdersDetail
+			viewOrdersDetail: false, //false: show OrdersSummary, true: show OrdersDetail
+
+			//MODAL
+			showModal: false,
+			modalTitle: "",
+			modalBody: ""
 		} 
 	}
 		
 	componentDidMount() {
-		this.getOrderByDate(this.state.startDate);
-	}
 
+		const d = new Date();
+		
+		d.setMinutes(0);
+		d.setHours(0);
+		d.setSeconds(0);
+		d.setMilliseconds(0);
+
+		this.setState({
+			startDate: d
+		});
+
+		this.getOrderByDate(d);
+	}
 
 	/*
 		getOrderByDate
 		---------------------
 	*/
 	getOrderByDate = (date) => {
+
+		console.log(date.getTime());
+
 		//Get order details
 		this.props.db.collection("orders").where("date", "==", date).limit(1).get().then(
 			snapshot => {
@@ -63,6 +86,7 @@ class Orders extends Component {
 		date.setMinutes(0);
 		date.setHours(0);
 		date.setSeconds(0);
+		date.setMilliseconds(0);
 
 		//Get the order
 		this.getOrderByDate(date);
@@ -199,6 +223,7 @@ class Orders extends Component {
 
 				this.setState({
 					restaurant: doc.data(),
+					restaurantid: restaurantid,
 					viewOrdersDetail: true
 				});
 			}
@@ -211,11 +236,20 @@ class Orders extends Component {
 		handleClickBack
 	*/
 	handleClickBack = () => {
-		//delete restaurant obj ? 
-		this.setState({
-			viewOrdersDetail: false,
-			restaurant: null
-		});
+
+		if ((this.state.orderEdited)&&(!this.state.orderSaved)) {
+			this.setState({
+				showModal: true,
+				modalTitle: "Sei sicuro di uscire?",
+				modalBody: "Alcune modifiche non sono state salvate."
+			});
+		} else {
+			//Go back
+			this.setState({
+				viewOrdersDetail: false,
+				restaurant: null
+			});
+		}
 	}
 
 	handleClickEditProduct = (productid, operation) => {
@@ -225,7 +259,7 @@ class Orders extends Component {
 		
 		//Find the index of products array
 		const index = r_copy.products.findIndex(function(element, index, array){
-			return element.id == productid;
+			return element.id === productid;
 		});
 	
 		if (operation === "add") {
@@ -238,7 +272,34 @@ class Orders extends Component {
 		}
 
 		this.setState({
-			restaurant: r_copy
+			restaurant: r_copy,
+			orderEdited: true
+		});
+	}
+
+	handleClickSave = () => {
+		//Write DOC to firestore
+		this.props.db.collection('orders').doc(this.state.orderid).collection("restaurants").doc(this.state.restaurantid).set(this.state.restaurant).then(ref => {
+			console.log("New DOC inserted.");
+			//Call this function recorsivly...
+			this.setState({
+				orderSaved: true
+			});
+		});
+	}
+
+	handleModalHide = () => {
+		this.setState({
+			showModal: false
+		});
+	}
+
+	handleModalConfirm = () => {
+		//Go back
+		this.setState({
+			viewOrdersDetail: false,
+			restaurant: null,
+			showModal: false
 		});
 	}
 
@@ -256,15 +317,25 @@ class Orders extends Component {
 					this.state.viewOrdersDetail?
 					<OrdersDetail 
 						restaurant={this.state.restaurant}
+						orderEdited={this.state.orderEdited}
+						handleClickSave={this.handleClickSave}
 						handleClickBack={this.handleClickBack}
-						handleClickEditProduct={this.handleClickEditProduct}/>
+						handleClickEditProduct={this.handleClickEditProduct}
+
+						showModal={this.state.showModal}
+						modalBody={this.state.modalBody}
+						modalTitle={this.state.modalTitle}
+						handleModalHide={this.handleModalHide}
+						handleModalConfirm={this.handleModalConfirm}
+						/>
 					: <OrdersSummary 
 						order={this.state.order}
 						handleClickNewOrder={this.createEmptyOrder}
 						handleClickRestaurant={this.handleClickRestaurant}/>
 				}
-								
 			</div>
+
+			
 		);
 	}
 }

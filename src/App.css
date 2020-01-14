@@ -1,5 +1,35 @@
+/*
+
+Colors:;
+from light
+->
+	6FFFE9
+	5BC0BE
+	3A506B
+	1C2541
+	0B132B
+->
+to dark
+*/
+
 .App {
   text-align: center;
-  background-color: gray;
+  background-color: #0B132B;
   min-height: 100vh;
+}
+
+.App a {
+	color: #6FFFE9;
+}
+
+.App .btn-primary {
+    color: #fff;
+    background-color: #5BC0BE;
+    border-color: #5BC0BE;
+}
+
+.App .btn-primary:hover {
+    color: #fff;
+    background-color: #586F7C;
+    border-color: #586F7C;
 }

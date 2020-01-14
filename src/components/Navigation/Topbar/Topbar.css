@@ -4,13 +4,15 @@
     position: absolute;
     top: 0;
     left: 0;
-    background-color: transparent;
+    background-color: #3A506B;
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 30px;
     box-sizing: border-box;
     max-width: 960px;
+
+    font-size: large;
 }
 
 .Topbar .Burger {
@@ -47,9 +49,11 @@
 @media (min-width:801px)  { /* tablet, landscape iPad, lo-res laptops ands desktops */ 
     .Topbar {
         height: 100px;
-        margin: auto;
-        max-width: 960px;
+        max-width: none;
         position: relative;
+        width: 100%;
+
+        padding: 0 14vw;
     }
     .Topbar .Burger {
         display: none;
@@ -62,18 +66,21 @@
         height: auto;
     }
     .Topbar .Logo a img{
-        width: 100%;
+        width: 65px;
+        position: relative;
+        top: -13px;
     }
     .Topbar nav {
         display: block;
     }
     .Topbar nav a {
         margin-left: 20px;
-        color: #FFFCF7;
         font-weight: bold;
+        color: white;
     }
     .Topbar nav a.active{
-        color: #1c1964;
+        color: #6FFFE9;
+        text-decoration: underline;
     }
 }
 @media (min-width:1025px) { /* big landscape tablets, laptops, and desktops */ }
