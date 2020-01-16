@@ -1,0 +1,17 @@
+.RestaurantsSummary h3 {
+	margin-top:25px;
+}
+.RestaurantsSummary .restaurantBox{
+    border-radius: 5px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #18213d;
+    margin-bottom: 10px;
+    font-size: large;
+    cursor: pointer;
+    color: white;
+}
+
+.RestaurantsSummary  #addRestaurantBox {
+	background-color: #5BC0BE;
+}

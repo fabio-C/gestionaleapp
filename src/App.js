@@ -8,7 +8,6 @@ import './App.css';
 
 //Import Components:
 import Topbar from './components/Navigation/Topbar/Topbar';
-import MobileMenu from './components/Navigation/MobileMenu/MobileMenu';
 
 import Orders from './components/Orders/Orders';
 import Products from './components/Products/Products';
@@ -68,16 +67,8 @@ class App extends Component {
     return (
       <div className="App">
 
-        <Topbar 
-          appstate={this.state}
-          open={this.state.showMobileMenu}
-          mobileMenuToggleClicked={this.mobileMenuToggleHandler} />
+        <Topbar />
 
-        <MobileMenu
-          appstate={this.state}
-          open={this.state.showMobileMenu}
-          closed={this.mobileMenuClosedHandler} />
-        
         <main>
           <Switch>
               <Route path="/" exact render={(props) => <Orders {...props} appstate={this.state} db={db}/>} />

@@ -22,3 +22,41 @@
     color: white;
     border-radius: 20px;
 }
+
+.OrdersSummary .productBox{
+    border-radius: 5px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #18213d;
+    margin-bottom: 10px;
+    font-size: large;
+    color: white;
+}
+
+.OrdersSummary .productBox span {
+    display: block;
+    width: 40px;
+    background-color: #3a506b;
+    margin: auto;
+    color: white;
+    border-radius: 20px;
+}
+
+
+.OrdersSummary #toggleButtons {
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.OrdersSummary #toggleButtons button {
+    padding: 5px 15px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+.OrdersSummary #toggleButtons button.focus {
+    background-color: #5BC0BE;
+}
+

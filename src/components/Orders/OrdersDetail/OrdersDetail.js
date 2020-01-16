@@ -25,31 +25,35 @@ const OrdersDetail = (props) => {
 	});
 
 	//Calculate total and totaleuro
-	let total = 0;
+	//let total = 0;
 	let totaleuro = 0;
 	for (var i = 0; i < props.restaurant.products.length; i++) {
-		total += props.restaurant.products[i].quantity;
+		//total += props.restaurant.products[i].quantity;
 		totaleuro = props.restaurant.products[i].price*props.restaurant.products[i].quantity;
 	}
 
 	return (
 		<Container className="OrdersDetail">
+
 			<Row>
-				<Col md={4}> 
+				<Col md={12}> 
+					<h3> Ristorante: {props.restaurant.name} </h3> 
+					<h5> Totale Euro: {totaleuro} </h5>
+				</Col>
+			</Row>
+
+
+			<Row>
+				<Col md={6} className="OrdersDetailButtons1"> 
 					<Button onClick={props.handleClickBack}> Indietro </Button> 
-				</Col> 
-				<Col md={4}> 
+				</Col>
+				<Col md={6} className="OrdersDetailButtons2"> 
 					<Button onClick={props.handleClickSave} disabled={!props.orderEdited}> Salva </Button> 
-				</Col> 
-				<Col md={4}> 
 					<Button onClick={null}> Stampa PDF </Button> 
 				</Col> 
+			</Row>
 
-				<Col md={12}> <h3> Ristorante: {props.restaurant.name} </h3> </Col>
-				
-				<Col md={6}> <h5> Totale: {total} </h5> </Col>
-				<Col md={6}> <h5> Totale Euro: {totaleuro} </h5> </Col>
-
+			<Row>
 				<Col md={12}>
 					<Table striped bordered hover>
 						<thead>

@@ -23,6 +23,7 @@ class Orders extends Component {
 
 			//RENDER FLAG
 			viewOrdersDetail: false, //false: show OrdersSummary, true: show OrdersDetail
+			modeRestaurant: true, //if true shows restaurant, else shows products
 
 			//MODAL
 			showModal: false,
@@ -52,9 +53,6 @@ class Orders extends Component {
 		---------------------
 	*/
 	getOrderByDate = (date) => {
-
-		console.log(date.getTime());
-
 		//Get order details
 		this.props.db.collection("orders").where("date", "==", date).limit(1).get().then(
 			snapshot => {
@@ -100,6 +98,12 @@ class Orders extends Component {
 
 	//------------------------------------------------------------ actions from OrdersSummary
 	
+
+	setModeRestaurant = (mode) => {
+		this.setState({
+			modeRestaurant: mode
+		});
+	}
 	/*
 		createEmptyOrder
 	*/
@@ -330,6 +334,8 @@ class Orders extends Component {
 						/>
 					: <OrdersSummary 
 						order={this.state.order}
+						modeRestaurant={this.state.modeRestaurant}
+						setModeRestaurant={this.setModeRestaurant}
 						handleClickNewOrder={this.createEmptyOrder}
 						handleClickRestaurant={this.handleClickRestaurant}/>
 				}

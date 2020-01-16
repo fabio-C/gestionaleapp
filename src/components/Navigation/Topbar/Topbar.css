@@ -1,87 +1,31 @@
 .Topbar {
-    height: 60px;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #3A506B;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 30px;
-    box-sizing: border-box;
-    max-width: 960px;
+	padding-left: 10vw;
+	padding-right: 10vw;
 
-    font-size: large;
+	background-color: #3A506B;
+}
+.Topbar img {
+    width: 60px;
+    padding: 5px;
 }
 
-.Topbar .Burger {
-    height: 100%;
-    background-color: transparent;
-    border: none;
-    right: 10px;
-    top: 10px;
-    position: absolute;
-    outline: none;
+.Topbar .navbar-light .navbar-nav .nav-link {
+	color: white;
+	font-size: large;
 }
 
-.Topbar .Burger img {
-    height: 80%;
+.Topbar .navbar-light .navbar-nav .nav-link.active {
+	color: #5BC0BE;
+	font-weight: bold;
+	text-decoration: underline;
 }
 
-.Topbar nav {
-    display: none;
-}
-
-.Topbar .Logo {
-    position: absolute;
-    height: 90%;
-    top: 14px;
-}
-
-.Topbar .Logo img {
-    height: 100%;
-}
 
 @media (min-width:320px)  { /* smartphones, portrait iPhone, portrait 480x320 phones (Android) */ }
 @media (min-width:480px)  { /* smartphones, Android phones, landscape iPhone */ }
 @media (min-width:600px)  { /* portrait tablets, portrait iPad, e-readers (Nook/Kindle), landscape 800x480 phones (Android) */ }
 @media (min-width:801px)  { /* tablet, landscape iPad, lo-res laptops ands desktops */ 
-    .Topbar {
-        height: 100px;
-        max-width: none;
-        position: relative;
-        width: 100%;
 
-        padding: 0 14vw;
-    }
-    .Topbar .Burger {
-        display: none;
-    }
-    .Topbar .Logo {
-        display: block;
-        width: 80px;
-        position: relative;
-        top: 15px;
-        height: auto;
-    }
-    .Topbar .Logo a img{
-        width: 65px;
-        position: relative;
-        top: -13px;
-    }
-    .Topbar nav {
-        display: block;
-    }
-    .Topbar nav a {
-        margin-left: 20px;
-        font-weight: bold;
-        color: white;
-    }
-    .Topbar nav a.active{
-        color: #6FFFE9;
-        text-decoration: underline;
-    }
 }
 @media (min-width:1025px) { /* big landscape tablets, laptops, and desktops */ }
 @media (min-width:1281px) { /* hi-res laptops and desktops */ }

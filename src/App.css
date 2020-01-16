@@ -16,6 +16,8 @@ to dark
   text-align: center;
   background-color: #0B132B;
   min-height: 100vh;
+
+  color: white;
 }
 
 .App a {
@@ -32,4 +34,14 @@ to dark
     color: #fff;
     background-color: #586F7C;
     border-color: #586F7C;
+}
+
+.App .btn-primary.disabled, .App .btn-primary:disabled {
+    background-color: #8f8f8f;
+    border-color: #8b8b8b;
+    cursor: initial;
+}
+
+.App main {
+  padding-top: 25px;
 }

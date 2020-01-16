@@ -1,25 +1,40 @@
 import React, {Component} from 'react';
+import {Container, Row, Col} from 'react-bootstrap';
+import './Products.css';
 
 class Products extends Component {
 
 	constructor(props){
 		super(props);
 		this.state = {
+      products: null //list of all products
 		}
 	}
 
-  componentDidMount() {}
-
-	/*
+  componentDidMount() {
+    this.getAllProducts();
+  }
 
 	getAllProducts = () => {
     //Get order details
-    db.collection("lists").doc("products").get().then(function(doc) {
-      console.log(doc.data());
+    this.props.db.collection("lists").doc("products").get().then(doc => {
+      
+      let products = doc.data().all;
+
+      //Sort alphabetically
+      products.sort(function(a, b){
+        if(a.name < b.name) { return -1; }
+        if(a.name > b.name) { return 1; }
+        return 0;
+      });
+
+      this.setState({
+        products: products
+      });
     });
   }
 
-
+  /*
   
 	createUpdateProductList = () => {
 
@@ -42,11 +57,37 @@ class Products extends Component {
 	  }
 	  */
 
+
   	render(){
+
+      let productsSummaryDOM = null;
+      if (this.state.products) {
+        productsSummaryDOM = this.state.products.map((product, index) => {
+          return(
+            <Col md={3} key={index}>
+              <div className="productBox" onClick={null}>
+                {product.name}
+              </div>
+            </Col>
+          )
+        })
+      }
+
     	return (
-	      	<div className="Products">
-		        <p> Prodotti </p>
-		    </div>
+	      	<Container className="Products">
+            <Row>
+
+              <Col md={12}> 
+                <h3> Lista Completa Prodotti </h3>
+              </Col>
+
+              <Col md={3}> 
+                <div className="productBox" id="addProductBox">Aggiungi prodotto </div>
+              </Col>
+              {productsSummaryDOM}
+
+            </Row>
+          </Container>
     	);
   	}
 
