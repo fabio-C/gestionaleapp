@@ -60,3 +60,9 @@
     background-color: #5BC0BE;
 }
 
+.OrdersSummary .lastButtons {
+    text-align: left;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+

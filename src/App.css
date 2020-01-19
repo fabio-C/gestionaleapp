@@ -42,6 +42,17 @@ to dark
     cursor: initial;
 }
 
+.App .btn-primary:not(:disabled):not(.disabled).active, .App .btn-primary:not(:disabled):not(.disabled):active {
+    color: #fff;
+    background-color: #3a506b;
+    border-color: #3a506b;
+}
+
+.App .btn-primary.focus, .App .btn-primary:focus {
+    color: #fff;
+    background-color: #3a506b;
+}
+
 .App main {
   padding-top: 25px;
 }

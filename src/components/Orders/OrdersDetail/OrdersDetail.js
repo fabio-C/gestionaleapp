@@ -29,7 +29,7 @@ const OrdersDetail = (props) => {
 	let totaleuro = 0;
 	for (var i = 0; i < props.restaurant.products.length; i++) {
 		//total += props.restaurant.products[i].quantity;
-		totaleuro = props.restaurant.products[i].price*props.restaurant.products[i].quantity;
+		totaleuro += props.restaurant.products[i].price*props.restaurant.products[i].quantity;
 	}
 
 	return (

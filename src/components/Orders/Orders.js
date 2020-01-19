@@ -10,8 +10,8 @@ class Orders extends Component {
 		super(props);
 		this.state = {
 
-			order: null,
-			orderid: null,
+			order: null, //The complete order obj
+			orderid: null, //ID of the order
 
 			startDate: null, //Initial date is today
 
@@ -33,7 +33,14 @@ class Orders extends Component {
 	}
 		
 	componentDidMount() {
+		this.getOrderToday();
+	}
 
+	/*
+		getOrderToday
+		---------------------
+	*/
+	getOrderToday = () => {
 		const d = new Date();
 		
 		d.setMinutes(0);
@@ -48,11 +55,19 @@ class Orders extends Component {
 		this.getOrderByDate(d);
 	}
 
+
 	/*
 		getOrderByDate
 		---------------------
 	*/
 	getOrderByDate = (date) => {
+
+		//Remove hours, minutes, seconds
+		date.setMinutes(0);
+		date.setHours(0);
+		date.setSeconds(0);
+		date.setMilliseconds(0);
+
 		//Get order details
 		this.props.db.collection("orders").where("date", "==", date).limit(1).get().then(
 			snapshot => {
@@ -72,7 +87,7 @@ class Orders extends Component {
 			});
 	}
 
-	//----------------------------------------------------------- actions from OrdersNavigation
+	//----------------------------------------------------------- events from OrdersNavigation
 	/*
 	 handleDateChange
 	 -----------------------
@@ -80,11 +95,7 @@ class Orders extends Component {
 	*/
 	handleDateChange = date => {
 
-		//Remove hours, minutes, seconds
-		date.setMinutes(0);
-		date.setHours(0);
-		date.setSeconds(0);
-		date.setMilliseconds(0);
+		
 
 		//Get the order
 		this.getOrderByDate(date);
@@ -96,7 +107,7 @@ class Orders extends Component {
 	};
 
 
-	//------------------------------------------------------------ actions from OrdersSummary
+	//------------------------------------------------------------ events from OrdersSummary
 	
 
 	setModeRestaurant = (mode) => {
@@ -234,8 +245,18 @@ class Orders extends Component {
 		});
 	}
 
+	/*
+		handleClickDelete
+	*/
+	handleClickDelete = () => {
+		this.props.db.collection('orders').doc(this.state.orderid).delete().then(() => {
+			alert("Ordine Eliminato");
+			this.getOrderByDate(this.state.startDate);
+		});
+	}
 
-	//------------------------------------------------------------ actions from OrdersDetail
+
+	//------------------------------------------------------------ events from OrdersDetail
 	/*
 		handleClickBack
 	*/
@@ -284,10 +305,15 @@ class Orders extends Component {
 	handleClickSave = () => {
 		//Write DOC to firestore
 		this.props.db.collection('orders').doc(this.state.orderid).collection("restaurants").doc(this.state.restaurantid).set(this.state.restaurant).then(ref => {
-			console.log("New DOC inserted.");
+			
+			alert("Dettagli Ordine Salvati.");
+			
 			//Call this function recorsivly...
 			this.setState({
-				orderSaved: true
+				orderSaved: true,
+				orderEdited: false,
+				viewOrdersDetail: false,
+				restaurant: null
 			});
 		});
 	}
@@ -303,7 +329,8 @@ class Orders extends Component {
 		this.setState({
 			viewOrdersDetail: false,
 			restaurant: null,
-			showModal: false
+			showModal: false,
+			orderEdited: false
 		});
 	}
 
@@ -337,7 +364,8 @@ class Orders extends Component {
 						modeRestaurant={this.state.modeRestaurant}
 						setModeRestaurant={this.setModeRestaurant}
 						handleClickNewOrder={this.createEmptyOrder}
-						handleClickRestaurant={this.handleClickRestaurant}/>
+						handleClickRestaurant={this.handleClickRestaurant}
+						handleClickDelete={this.handleClickDelete}/>
 				}
 			</div>
 

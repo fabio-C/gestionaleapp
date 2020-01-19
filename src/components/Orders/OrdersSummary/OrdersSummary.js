@@ -65,6 +65,14 @@ const OrdersSummary = (props) => {
 
 		  	{orderSummaryDOM}
 		  	{noOrderDOM}
+
+		  	{(props.order)?
+		  		<Col md={12} className="lastButtons">
+					<Button variant="danger" onClick={props.handleClickDelete}> Elimina Ordine </Button>
+				</Col>
+				: null
+		  	}
+		  	
 		  </Row>
 		</Container>
 	);

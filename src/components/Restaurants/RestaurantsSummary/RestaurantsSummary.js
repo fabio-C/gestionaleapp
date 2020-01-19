@@ -10,7 +10,7 @@ const RestaurantsSummary = (props) => {
 		restaurantsSummaryDOM = props.restaurants.map((restaurant, index) => {
 			return(
 				<Col md={3} key={index}>
-					<div className="restaurantBox" onClick={null}>
+					<div className="restaurantBox" onClick={() => props.handleClickRestaurant(restaurant.id)}>
 						{restaurant.name}
 					</div>
 				</Col>
@@ -22,13 +22,13 @@ const RestaurantsSummary = (props) => {
 		<Container className="RestaurantsSummary">
 		  <Row>
 
-		  	<Col md={12}> 
-		  		<h3> Lista Completa Ristoranti </h3> 
+		  	<Col md={12}>
+		  		<h3> Lista Completa Ristoranti </h3>
 		  		<p> Clicca su un ristorante per visualizzare o modificare i dati associati.</p>
 		  	</Col>
 
 		  	<Col md={3}> 
-		  		<div className="restaurantBox" id="addRestaurantBox">Aggiungi ristorante </div>
+		  		<div className="restaurantBox" id="addRestaurantBox" onClick={props.handleClickNewRestaurant}>Aggiungi ristorante </div>
 		  	</Col>
 			{restaurantsSummaryDOM}
 
