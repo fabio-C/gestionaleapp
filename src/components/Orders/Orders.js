@@ -94,9 +94,6 @@ class Orders extends Component {
 	fired when user select a new date from date picker
 	*/
 	handleDateChange = date => {
-
-		
-
 		//Get the order
 		this.getOrderByDate(date);
 
@@ -315,6 +312,15 @@ class Orders extends Component {
 				viewOrdersDetail: false,
 				restaurant: null
 			});
+
+			//Refresh and show new empty order
+			this.getOrderByDate(this.state.startDate);
+
+			/*
+			setTimeout((){ 
+
+			}, 1000);
+			*/
 		});
 	}
 

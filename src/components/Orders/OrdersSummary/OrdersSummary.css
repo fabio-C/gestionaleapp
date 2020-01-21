@@ -7,7 +7,7 @@
     border-radius: 5px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: #18213d;
+    background-color: #3a506b;
     margin-bottom: 10px;
     font-size: large;
     cursor: pointer;
@@ -17,30 +17,49 @@
 .OrdersSummary .restaurantBox span {
 	display: block;
     width: 40px;
-    background-color: #3a506b;
+    background-color: #5bc0be;
     margin: auto;
     color: white;
     border-radius: 20px;
+}
+
+.OrdersSummary .restaurantBox.empty{
+    background-color: #18213d;
+}
+
+.OrdersSummary .restaurantBox.empty span {
+    color: #18213d;
+    background-color: #293350;
 }
 
 .OrdersSummary .productBox{
     border-radius: 5px;
     padding-top: 15px;
     padding-bottom: 15px;
-    background-color: #18213d;
+    background-color: #3a506b;
     margin-bottom: 10px;
     font-size: large;
     color: white;
 }
 
+.OrdersSummary .productBox.empty{
+    background-color: #18213d;
+}
+
 .OrdersSummary .productBox span {
     display: block;
     width: 40px;
-    background-color: #3a506b;
+    background-color: #5bc0be;
     margin: auto;
     color: white;
     border-radius: 20px;
 }
+
+.OrdersSummary .productBox.empty span {
+    color: #18213d;
+    background-color: #293350;
+}
+
 
 
 .OrdersSummary #toggleButtons {
