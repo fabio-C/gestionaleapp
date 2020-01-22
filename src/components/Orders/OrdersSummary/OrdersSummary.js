@@ -61,8 +61,8 @@ const OrdersSummary = (props) => {
 		  		<Auxiliary>
 			  		
 			  		<Col md={12} id="toggleButtons">
-						<button className={button_r_classes} onClick={() => props.setModeRestaurant(true)} > Vista Ristoranti </button>
-						<button className={button_p_classes} onClick={() => props.setModeRestaurant(false)} > Vista Prodotti </button>
+						<button className={button_r_classes} onClick={() => props.setModeRestaurant(true)} > Vista Ristoranti 🍝 </button>
+						<button className={button_p_classes} onClick={() => props.setModeRestaurant(false)} > Vista Prodotti 🌿 </button>
 					</Col>
 		  		
 			  		{orderSummaryDOM}
