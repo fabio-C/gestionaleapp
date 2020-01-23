@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Container, Row, Col, Button} from 'react-bootstrap';
 
-import HistoricalTable from './HistoricalTable/HistoricalTable';
+import HistoricalChart from './HistoricalChart/HistoricalChart';
 
 class Historical extends Component {
 
@@ -10,6 +10,9 @@ class Historical extends Component {
 		this.state = {
 			month: null,
 			year: 2020,
+
+			restaurants: null, //List of all restaurants
+			//products: null, //List of all products
 			orders: null //List of all the order in the selected month
 		}
 	}
@@ -19,7 +22,25 @@ class Historical extends Component {
 	}
 
 	handleClickStart = () => {
+		
+		//Get all orders
 		this.getOrdersByMonth(this.state.month, this.state.year);
+
+		//Get all restaurants list
+		//Get all restaurant doc
+		this.props.db.collection("lists").doc("restaurants").get().then(doc => {
+			let restaurants = doc.data().all;
+			//Sort alphabetically
+			restaurants.sort(function(a, b){
+				if(a.name < b.name) { return -1; }
+				if(a.name > b.name) { return 1; }
+				return 0;
+			});
+			this.setState({
+				restaurants: restaurants
+			});
+		});
+
 	}
 
 	/*
@@ -71,6 +92,12 @@ class Historical extends Component {
 		});
 	}
 
+	restaurantSelected = (e) => {
+		this.setState({
+			r: parseInt(e.target.value)
+		});
+	}
+
   	render(){
     	return (
     		<Container className="Historical">
@@ -100,13 +127,18 @@ class Historical extends Component {
 						  <option value={2022}>2022</option>
 						  <option value={2023}>2023</option>
 						</select>
+
 			  		</Col>
 
 			  		<Col md={12}>
 						<Button variant="primary" onClick={this.handleClickStart} disabled={this.state.month === null}> Vai </Button>
 					</Col>
 
-					<HistoricalTable />
+					<HistoricalChart 
+						orders={this.state.orders} 
+						restaurants={this.state.restaurants}
+						month={this.state.month}
+						year={this.state.year}/>
 
 			    </Row>
 			</Container>
