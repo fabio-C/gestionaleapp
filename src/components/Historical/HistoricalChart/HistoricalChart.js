@@ -1,12 +1,12 @@
 import React from 'react';
-import {Container, Row, Col, Table} from 'react-bootstrap';
+import {Row, Col} from 'react-bootstrap';
 
 import { Bar } from 'react-chartjs-2';
 import "./HistoricalChart.css";
 
 const HistoricalChart = (props) => {
 
-	//props.restaurants: list of all restaurants in the system
+	//props.restaurantsForChart: list of all restaurantsForChart to display in chart
 	//props.orders: list of all the order in the selected month
 
 	//Calculate an array of the days of a month:
@@ -20,24 +20,23 @@ const HistoricalChart = (props) => {
 	let labels = [];
 
 	//Create the structure of datasets, with restaurant name, and empty data
-	if(props.restaurants){
-		for (var i = 0; i < props.restaurants.length; i++) {
-			datasets.push(
-				{
-		            label: props.restaurants[i].name,
-		            backgroundColor: 'rgb(155, 99, 132)',
-		            data: [],
-		            id: props.restaurants[i].id
-		        }
-			)
-		}
+
+	for (var i = 0; i < props.restaurantsForChart.length; i++) {
+		datasets.push(
+			{
+		        label: props.restaurantsForChart[i].name,
+		        backgroundColor: '#'+Math.floor(Math.random()*16777215).toString(16),
+		        data: [],
+		        id: props.restaurantsForChart[i].id
+		    }
+		)
 	}
 
 	//Popolate datasets and labels
 	if (props.orders && datasets.length) {
 
 		//For each days of the month
-		for (var i = 0; i < monthdates.length; i++) {
+		for (i = 0; i < monthdates.length; i++) {
 
 			//Add month number to labels
 			labels.push(monthdates[i].getDate());
@@ -63,7 +62,6 @@ const HistoricalChart = (props) => {
 						
 						//For each restaurants in the summary
 						for (var z = 0; z < props.orders[j].restaurantSummary.length; z++) {
-
 							//Compare restaurant id
 							if(datasets[k].id === props.orders[j].restaurantSummary[z].id){
 								//If restaurant found, get the total
@@ -122,23 +120,20 @@ const HistoricalChart = (props) => {
             yAxes: [{
                 stacked: true
             }]
+        },
+        legend: {
+        	display: false
         }
     }
 
 	return (
-		<Container className="HistoricalChart">
-		  <Row>	
-
+		<Row className="HistoricalChart">	
 		  	<Col md={12}>
 		  		<Bar
-				  data={data}
-				  options={options}
-				/>
-
+					data={data}
+					options={options}/>
 			</Col>
-
-		  </Row>
-		</Container>
+	    </Row>
 	);
 }
 

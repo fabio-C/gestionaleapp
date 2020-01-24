@@ -23,8 +23,9 @@ const ProductsSummary = (props) => {
 		  <Row>
 
 		  	<Col md={12}>
-		  		<h3> Lista Completa Prodotti 🌿 </h3>
+		  		<h3> Lista Completa Prodotti <span role="img" aria-label="leaf">🌿</span> </h3>
 		  		<p> Clicca su un prodotto per visualizzare o modificare i dati associati.</p>
+		  		<hr></hr>
 		  	</Col>
 
 		  	<Col md={3}> 

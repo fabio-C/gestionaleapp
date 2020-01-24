@@ -1,0 +1,27 @@
+.Historical select {
+	font-size: large;
+    padding: 5px;
+    margin: 3px;
+    border-radius: 5px;
+}
+
+.Historical #toggleButtons {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.Historical #toggleButtons button {
+    padding: 5px 15px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+.Historical #toggleButtons button.focus {
+    background-color: #5BC0BE;
+}
+
+.Historical #selectButtons button {
+    margin: 4px;
+}

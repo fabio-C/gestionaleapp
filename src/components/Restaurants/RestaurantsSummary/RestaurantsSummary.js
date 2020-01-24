@@ -23,8 +23,9 @@ const RestaurantsSummary = (props) => {
 		  <Row>
 
 		  	<Col md={12}>
-		  		<h3> Lista Completa Ristoranti 🍝 </h3>
+		  		<h3> Lista Completa Ristoranti <span role="img" aria-label="restaurant">🍝</span> </h3>
 		  		<p> Clicca su un ristorante per visualizzare o modificare i dati associati.</p>
+		  		<hr></hr>
 		  	</Col>
 
 		  	<Col md={3}> 

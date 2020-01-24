@@ -298,27 +298,27 @@ class Restaurants extends Component {
 
 	render(){
 		return (
-				<div className="Restaurants">
-					{this.state.viewRestaurantsDetail?
-						<RestaurantsDetail 
-							restaurant={this.state.restaurant}
-							showModal={this.state.showModal}
-							modalTitle={this.state.modalTitle}
-							modalBody={this.state.modalBody}
-							restaurantEdited={this.state.restaurantEdited}
-							handleClickBack={this.handleClickBack}
-							handleClickSave={this.handleClickSave}
-							handleChangeRestaurant={this.handleChangeRestaurant}
+			<div className="Restaurants">
+				{this.state.viewRestaurantsDetail?
+					<RestaurantsDetail 
+						restaurant={this.state.restaurant}
+						showModal={this.state.showModal}
+						modalTitle={this.state.modalTitle}
+						modalBody={this.state.modalBody}
+						restaurantEdited={this.state.restaurantEdited}
+						handleClickBack={this.handleClickBack}
+						handleClickSave={this.handleClickSave}
+						handleChangeRestaurant={this.handleChangeRestaurant}
 
-							handleModalHide={this.handleModalHide}
-							handleModalConfirm={this.handleModalConfirm}
-							handleClickDelete={this.handleClickDelete}/>
-						:
-						<RestaurantsSummary 
-							restaurants={this.state.restaurants}
-							handleClickRestaurant={this.handleClickRestaurant}
-							handleClickNewRestaurant={this.handleClickNewRestaurant}/>
-					}
+						handleModalHide={this.handleModalHide}
+						handleModalConfirm={this.handleModalConfirm}
+						handleClickDelete={this.handleClickDelete}/>
+					:
+					<RestaurantsSummary 
+						restaurants={this.state.restaurants}
+						handleClickRestaurant={this.handleClickRestaurant}
+						handleClickNewRestaurant={this.handleClickNewRestaurant}/>
+				}
 					
 			</div>
 		);

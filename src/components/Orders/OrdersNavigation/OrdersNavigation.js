@@ -13,12 +13,13 @@ const OrdersNavigation = (props) => {
 		<Container className="OrdersNavigation">
 		  <Row>
 		  	<Col md={12}>
-		  		<h3>Ordini del</h3>
+		  		<h3>Ordini <span role="img" aria-label="pack">📦</span></h3>
 			  	<DatePicker
 			        selected={props.startDate}
 			        onChange={props.handleDateChange}
 			        dateFormat="MMMM d, yyyy"
 			    />
+		  		<hr></hr>
 			</Col>
 		  </Row>
 		</Container>

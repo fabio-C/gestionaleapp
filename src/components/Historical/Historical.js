@@ -2,30 +2,29 @@ import React, {Component} from 'react';
 import {Container, Row, Col, Button} from 'react-bootstrap';
 
 import HistoricalChart from './HistoricalChart/HistoricalChart';
+import './Historical.css';
 
 class Historical extends Component {
 
 	constructor(props){
 		super(props);
 		this.state = {
+			restaurants: null, //List of all restaurants
+			products: null, //List of all products
+			orders: null, //List of all the order in the selected month
+
 			month: null,
 			year: 2020,
+			modeRestaurant: true, //Show restaurant chart
 
-			restaurants: null, //List of all restaurants
-			//products: null, //List of all products
-			orders: null //List of all the order in the selected month
+			//Chart
+			restaurantsForChart: [], //List of the restaurant to display. Can be one or all.
+			productsForChart: [], //List of the restaurant to display. Can be one or all.
+			displayChart: false //FLAG
 		}
 	}
 
 	componentDidMount() {
-		//this.getOrdersByMonth(0, 2020);
-	}
-
-	handleClickStart = () => {
-		
-		//Get all orders
-		this.getOrdersByMonth(this.state.month, this.state.year);
-
 		//Get all restaurants list
 		//Get all restaurant doc
 		this.props.db.collection("lists").doc("restaurants").get().then(doc => {
@@ -37,10 +36,15 @@ class Historical extends Component {
 				return 0;
 			});
 			this.setState({
-				restaurants: restaurants
+				restaurants: restaurants,
+				restaurantsForChart: restaurants //initially display all restaurants
 			});
 		});
+	}
 
+	handleClickStart = () => {
+		//Get all orders
+		this.getOrdersByMonth(this.state.month, this.state.year);
 	}
 
 	/*
@@ -74,7 +78,8 @@ class Historical extends Component {
 					};
 
 					this.setState({
-						orders: orders
+						orders: orders,
+						displayChart: true
 					});
 				}
 			});
@@ -93,18 +98,56 @@ class Historical extends Component {
 	}
 
 	restaurantSelected = (e) => {
-		this.setState({
-			r: parseInt(e.target.value)
-		});
+		if (e.target.value === "all") {
+			this.setState({
+				restaurantsForChart: this.state.restaurants
+			});	
+		} else {
+			//todo
+			this.setState({
+				restaurantsForChart: [this.state.restaurants.find(r => r.id === e.target.value)]
+			});
+		}
+		
 	}
 
   	render(){
+
+  		let restaurantsSelectDOM = null;
+  		if (this.state.restaurants) {
+  			restaurantsSelectDOM = this.state.restaurants.map(r => {
+  				return(
+  					<option value={r.id} key={r.id}>{r.name}</option>
+  				)
+  			});
+  		}
+
+  		//buttons classes
+		let button_r_classes = null;
+		let button_p_classes = null;
+		if (this.state.modeRestaurant) {
+			button_r_classes = "focus";
+			button_p_classes = "";
+		} else {
+			button_r_classes = "";
+			button_p_classes = "focus";
+		}
+
     	return (
     		<Container className="Historical">
 	      		<Row>
-			  		<Col md={12}>
-				        <p> Storici</p>
+	      			<Col md={12}>
+				  		<h3> Storici Dati <span role="img" aria-label="book">📚</span> </h3>
+				  		<p> Seleziona Mese, Anno e Ristorante per visualizzare l'andamento degli ordini o dei prodotti.</p>
+				  		<hr></hr>
+				  	</Col>
 
+				  	<Col md={12} id="toggleButtons">
+						<button className={button_r_classes} onClick={() => this.props.setModeRestaurant(true)} > Storico Ristoranti <span role="img" aria-label="restaurant">🍝</span> </button>
+						<button className={button_p_classes} onClick={() => this.props.setModeRestaurant(false)} > Storico Prodotti <span role="img" aria-label="green">🌿</span> </button>
+					</Col>
+
+			  		<Col md={12} id="selectButtons">
 				        <select onChange={this.monthSelected}>
 						  <option value={null}>Seleziona Mese</option>
 						  <option value={0}>Gennaio</option>
@@ -128,20 +171,26 @@ class Historical extends Component {
 						  <option value={2023}>2023</option>
 						</select>
 
+						<select onChange={this.restaurantSelected}>
+						  <option value="all">Tutti i ristoranti</option>
+						  {restaurantsSelectDOM}
+						</select>
+
+						<Button variant="primary" onClick={this.handleClickStart} disabled={this.state.month === null}> Avvia ricerca </Button>
+			  		
 			  		</Col>
-
-			  		<Col md={12}>
-						<Button variant="primary" onClick={this.handleClickStart} disabled={this.state.month === null}> Vai </Button>
-					</Col>
-
-					<HistoricalChart 
-						orders={this.state.orders} 
-						restaurants={this.state.restaurants}
-						month={this.state.month}
-						year={this.state.year}/>
-
 			    </Row>
+
+			    {this.state.displayChart?
+				    <HistoricalChart 
+						orders={this.state.orders}
+						month={this.state.month}
+						year={this.state.year}
+						restaurantsForChart={this.state.restaurantsForChart}/>
+				: null}
 			</Container>
+
+			
     	);
   	}
 }

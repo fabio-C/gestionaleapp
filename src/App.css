@@ -56,3 +56,7 @@ to dark
 .App main {
   padding-top: 25px;
 }
+
+.App hr {
+  background-color: #3a506b;
+}
