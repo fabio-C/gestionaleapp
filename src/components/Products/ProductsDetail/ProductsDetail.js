@@ -21,13 +21,19 @@ const ProductsDetail = (props) => {
 
 			  	<Col md={12} id="inputContainers"> 
 
-			  		<label>{props.product.id}</label>
+			  		<label>ID Prodotto: {props.product.id}</label>
 			  		
 			  		<label>Nome Prodotto</label>
 			  		<input type="text" value={props.product.name} id="name" onChange={props.handleChangeProduct}/>			  		
 
-			  		<label>Price</label>
+			  		<label>Prezzo vaschetta(€)</label>
 			  		<input type="number" value={props.product.price} id="price" onChange={props.handleChangeProduct}/>
+
+			  		<label>Peso vaschetta (grammi)</label>
+			  		<input type="number" value={props.product.weight} id="weight" onChange={props.handleChangeProduct}/>
+
+			  		<label>Percentuale IVA (%)</label>
+			  		<input type="number" value={props.product.iva} id="iva" onChange={props.handleChangeProduct}/>
 			  		
 			  	</Col>
 		  	</Row>

@@ -20,16 +20,29 @@ const HistoricalChart = (props) => {
 	let labels = [];
 
 	//Create the structure of datasets, with restaurant name, and empty data
-
-	for (var i = 0; i < props.restaurantsForChart.length; i++) {
-		datasets.push(
-			{
-		        label: props.restaurantsForChart[i].name,
-		        backgroundColor: '#'+Math.floor(Math.random()*16777215).toString(16),
-		        data: [],
-		        id: props.restaurantsForChart[i].id
-		    }
-		)
+	let i = 0;
+	if (props.modeRestaurant) {
+		for (i = 0; i < props.restaurantsForChart.length; i++) {
+			datasets.push(
+				{
+			        label: props.restaurantsForChart[i].name,
+			        backgroundColor: '#'+Math.floor(Math.random()*16777215).toString(16),
+			        data: [],
+			        id: props.restaurantsForChart[i].id
+			    }
+			)
+		}
+	} else {
+		for (i = 0; i < props.productsForChart.length; i++) {
+			datasets.push(
+				{
+			        label: props.productsForChart[i].name,
+			        backgroundColor: '#'+Math.floor(Math.random()*16777215).toString(16),
+			        data: [],
+			        id: props.productsForChart[i].id
+			    }
+			)
+		}
 	}
 
 	//Popolate datasets and labels
@@ -42,10 +55,10 @@ const HistoricalChart = (props) => {
 			labels.push(monthdates[i].getDate());
 
 			//For each day, find if the order exist
-			var orderFound = false; //Flag
+			let orderFound = false; //Flag
 
 			//For each orders
-			for (var j = 0; j < props.orders.length; j++) {
+			for (let j = 0; j < props.orders.length; j++) {
 
 				//Compare date
 				if(monthdates[i].getTime() === props.orders[j].date.seconds*1000){
@@ -56,17 +69,28 @@ const HistoricalChart = (props) => {
 					//same restarant of the datasets obj
 
 					//For each restaurants in the system
-					for (var k = 0; k < datasets.length; k++) {
+					for (let k = 0; k < datasets.length; k++) {
 						
-						var total = 0;
-						
-						//For each restaurants in the summary
-						for (var z = 0; z < props.orders[j].restaurantSummary.length; z++) {
-							//Compare restaurant id
-							if(datasets[k].id === props.orders[j].restaurantSummary[z].id){
-								//If restaurant found, get the total
-								total = props.orders[j].restaurantSummary[z].total;
-							}	
+						let total = 0;
+						let z = 0;
+						if (props.modeRestaurant) {
+							//For each restaurants in the summary
+							for (z = 0; z < props.orders[j].restaurantSummary.length; z++) {
+								//Compare restaurant id
+								if(datasets[k].id === props.orders[j].restaurantSummary[z].id){
+									//If restaurant found, get the total
+									total = props.orders[j].restaurantSummary[z].total;
+								}	
+							}
+						} else {
+							//For each products in the summary
+							for (z = 0; z < props.orders[j].productSummary.length; z++) {
+								//Compare restaurant id
+								if(datasets[k].id === props.orders[j].productSummary[z].id){
+									//If product found, get the total
+									total = props.orders[j].productSummary[z].total;
+								}	
+							}
 						}
 
 						//Update datasets obj
@@ -115,10 +139,24 @@ const HistoricalChart = (props) => {
     var options = {
     	scales: {
             xAxes: [{
-                stacked: true
+                stacked: true,
+                gridLines: { color: "#131c2b" },
+                scaleLabel: {
+			        display: true,
+			        labelString: 'Giorno del mese'
+			    }
             }],
             yAxes: [{
-                stacked: true
+                stacked: true,
+                gridLines: { color: "#131c2b" },
+                ticks: {
+		          beginAtZero: true,
+		          min: 0
+		        },
+		        scaleLabel: {
+			        display: true,
+			        labelString: 'Ordini'
+			    }
             }]
         },
         legend: {

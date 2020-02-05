@@ -13,7 +13,7 @@ const OrdersDetail = (props) => {
 					<div>
 						<button onClick={() => props.handleClickEditProduct(product.id, "subtract")}> - </button>
 					</div>
-					<div>
+					<div className="productQuantity">
 						{product.quantity}
 					</div>
 					<div>
@@ -49,7 +49,7 @@ const OrdersDetail = (props) => {
 				</Col>
 				<Col md={6} className="OrdersDetailButtons2"> 
 					<Button onClick={props.handleClickSave} disabled={!props.orderEdited}> Salva </Button> 
-					<Button onClick={null}> Stampa PDF </Button> 
+					<Button onClick={props.handleClickPrint} disabled={props.orderEdited}> Stampa Fattura </Button> 
 				</Col> 
 			</Row>
 

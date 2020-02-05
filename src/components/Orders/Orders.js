@@ -4,6 +4,8 @@ import OrdersNavigation from './OrdersNavigation/OrdersNavigation';
 import OrdersSummary from './OrdersSummary/OrdersSummary';
 import OrdersDetail from './OrdersDetail/OrdersDetail';
 
+import axios from 'axios';
+
 class Orders extends Component {
 
 	constructor(props){
@@ -13,7 +15,7 @@ class Orders extends Component {
 			order: null, //The complete order obj
 			orderid: null, //ID of the order
 
-			startDate: null, //Initial date is today
+			orderDate: null, //Initial date is today
 
 			//OrdersDetail state
 			restaurant: null,
@@ -49,7 +51,7 @@ class Orders extends Component {
 		d.setMilliseconds(0);
 
 		this.setState({
-			startDate: d
+			orderDate: d
 		});
 
 		this.getOrderByDate(d);
@@ -99,7 +101,7 @@ class Orders extends Component {
 
 		//Change the state
 		this.setState({
-			startDate: date
+			orderDate: date
 		});
 	};
 
@@ -143,7 +145,7 @@ class Orders extends Component {
 
 					//Create firestore data obj
 					let data = {
-						date: this.state.startDate,
+						date: this.state.orderDate,
 						restaurantSummary: restaurants.map(function(r){
 							return(
 								{
@@ -160,7 +162,9 @@ class Orders extends Component {
 									name: p.name,
 									price: p.price,
 									sub:p.sub,
-									total: 0
+									total: 0,
+									weight: p.weight,
+									iva: p.iva
 								}
 							)
 						})
@@ -171,7 +175,7 @@ class Orders extends Component {
 						console.log('Added orderd document');
 
 						//Refresh and show new empty order
-						this.getOrderByDate(this.state.startDate);
+						this.getOrderByDate(this.state.orderDate);
 					});
 				}
 
@@ -209,6 +213,7 @@ class Orders extends Component {
 					//Create firestore object
 					let data = {
 						name: restaurantname,
+						date:this.state.orderDate,
 						products: products.map(function(p){
 							return(
 								{
@@ -216,7 +221,9 @@ class Orders extends Component {
 									name: p.name,
 									price: p.price,
 									sub:p.sub,
-									quantity: 0
+									quantity: 0,
+									weight: p.weight,
+									iva: p.iva
 								}
 							)
 						})
@@ -248,7 +255,7 @@ class Orders extends Component {
 	handleClickDelete = () => {
 		this.props.db.collection('orders').doc(this.state.orderid).delete().then(() => {
 			alert("Ordine Eliminato");
-			this.getOrderByDate(this.state.startDate);
+			this.getOrderByDate(this.state.orderDate);
 		});
 	}
 
@@ -266,6 +273,9 @@ class Orders extends Component {
 				modalBody: "Alcune modifiche non sono state salvate."
 			});
 		} else {
+
+			this.getOrderByDate(this.state.orderDate);
+
 			//Go back
 			this.setState({
 				viewOrdersDetail: false,
@@ -309,19 +319,31 @@ class Orders extends Component {
 			this.setState({
 				orderSaved: true,
 				orderEdited: false,
-				viewOrdersDetail: false,
-				restaurant: null
+				//viewOrdersDetail: false,
+				//restaurant: null
 			});
 
-			//Refresh and show new empty order
-			this.getOrderByDate(this.state.startDate);
-
 			/*
-			setTimeout((){ 
 
-			}, 1000);
 			*/
+			
 		});
+	}
+
+	handleClickPrint = () => {
+
+		if (this.state.orderid && this.state.restaurantid) {
+			axios.get('https://europe-west2-gestionalethecircle.cloudfunctions.net/createOrderPDF?orderid=' + this.state.orderid + '&restaurantid=' + this.state.restaurantid)
+	      	.then(res => {
+	      		if (res.data.status === "ok") {
+	      			window.open(res.data.url, '_blank').focus();
+	      		} else {
+	      			alert("Ops. Errore in fase di stampa. Contattare qualcuno bravo.")
+	      		}
+	      		
+	        });	
+		}
+		
 	}
 
 	handleModalHide = () => {
@@ -347,7 +369,7 @@ class Orders extends Component {
 			<div className="Orders">
 
 				<OrdersNavigation 
-					startDate={this.state.startDate}
+					orderDate={this.state.orderDate}
 					handleDateChange={this.handleDateChange}/>
 
 				{
@@ -359,6 +381,7 @@ class Orders extends Component {
 						handleClickBack={this.handleClickBack}
 						handleClickEditProduct={this.handleClickEditProduct}
 
+						handleClickPrint={this.handleClickPrint}
 						showModal={this.state.showModal}
 						modalBody={this.state.modalBody}
 						modalTitle={this.state.modalTitle}

@@ -43,11 +43,18 @@ text-align: right;
 
 
 .OrdersDetail table tbody tr td button {
-	border: none;
-    height: 25px;
-    width: 25px;
-    background-color: #a3a3a3;
+    border: none;
+    border-radius: 25px;
+    height: 30px;
+    width: 30px;
+    background-color: #425b79;
+    color: white;
 }
 
-.OrdersDetail table tbody tr td {
+.OrdersDetail .table-hover tbody tr:hover {
+    color: #6FFFE9;
+}
+
+.OrdersDetail table .productQuantity {
+    font-size: large;
 }

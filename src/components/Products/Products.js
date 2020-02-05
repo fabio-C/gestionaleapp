@@ -27,10 +27,17 @@ class Products extends Component {
 
 	componentDidMount() {
 		this.getAllProducts();
+		//this.resetProductList();
 	}
 
+
+	/*
+		getAllProducts
+		---------------------
+		Get all products list
+	*/
 	getAllProducts = () => {
-		//Get order details
+		//Get all products
 		this.props.db.collection("lists").doc("products").get().then(doc => {
 			
 			let products = doc.data().all;
@@ -48,9 +55,13 @@ class Products extends Component {
 		});
 	}
 
+
 	/*
-	
-	createUpdateProductList = () => {
+		resetProductList
+		---------------------
+		Can bu used to reset manually all the list
+	*/
+	resetProductList = () => {
 
 		const productNames = ["Centocchio", "Coriandolo", "Erba Cipollina", "Elicriso", "Finocchietto", "Timo limone", "Timo", "Santoreggia", "Melissa", "Menta Hierba Buena", "Prezzemolo light", "Origano", "Artemisia assenzio", "Basella Rubra", "Pimpinella", "Levistico",  "Acetosella", "Oyster leafes", "Insalata Baby", "Mizuna green", "Mizuna red", "Komatzuna", "Senape rossa", "Bietolina rossa e gialla", "Tatsoi", "Baby rucola", "Acetosa", "Mix Baby leafes", "Mix Baby Leafes + Aromatiche", "Crescione", "Ravanello Rosso"];
 
@@ -60,16 +71,17 @@ class Products extends Component {
 					{
 						id: makeid(8),
 						name: name,
-						price: 0,
-						sub: 0
+						price: 1,
+						sub: 0,
+						weight: 10,
+						iva: 5
 					}
 				)
 			})
 		}
 
-	db.collection('lists').doc("products").set(data);
+		this.props.db.collection('lists').doc("products").set(data);
 	}
-	*/
 
 
 
@@ -147,12 +159,12 @@ class Products extends Component {
 		//Copy the product obj
 		let p_copy = {...this.state.product };
 
-		if (e.target.id === "price") {
-			//change the parameter
-			p_copy[e.target.id] = parseFloat(e.target.value);
-		} else {
+		if (e.target.id === "name") {
 			//change the parameter
 			p_copy[e.target.id] = e.target.value;
+		} else {
+			//change the parameter
+			p_copy[e.target.id] = parseFloat(e.target.value);
 		}
 		
 		
