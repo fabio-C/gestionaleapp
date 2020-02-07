@@ -25,7 +25,7 @@ class Orders extends Component {
 
 			//RENDER FLAG
 			viewOrdersDetail: false, //false: show OrdersSummary, true: show OrdersDetail
-			modeRestaurant: true, //if true shows restaurant, else shows products
+			modeRestaurant: 0, //0: show restaurant, //1: show products, //2: show summary
 
 			//MODAL
 			showModal: false,
