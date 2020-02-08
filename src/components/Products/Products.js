@@ -26,33 +26,7 @@ class Products extends Component {
 	}
 
 	componentDidMount() {
-		this.getAllProducts();
 		//this.resetProductList();
-	}
-
-
-	/*
-		getAllProducts
-		---------------------
-		Get all products list
-	*/
-	getAllProducts = () => {
-		//Get all products
-		this.props.db.collection("lists").doc("products").get().then(doc => {
-			
-			let products = doc.data().all;
-
-			//Sort alphabetically
-			products.sort(function(a, b){
-				if(a.name < b.name) { return -1; }
-				if(a.name > b.name) { return 1; }
-				return 0;
-			});
-
-			this.setState({
-				products: products
-			});
-		});
 	}
 
 
@@ -94,7 +68,7 @@ class Products extends Component {
 	handleClickProduct = (productid) => {
 
 		//Retrieve the product object from the array, using id
-		const p = this.state.products.find(element => {
+		const p = this.props.appstate.products.find(element => {
 			return (element.id === productid)
 		});
 
@@ -115,7 +89,9 @@ class Products extends Component {
 			name: "",
 			id: makeid(8),
 			price: 0,
-			sub: 0
+			weight: 0,
+			sub: 0,
+			iva: 10
 		};
 
 		this.setState({
@@ -182,56 +158,54 @@ class Products extends Component {
 	*/
 	handleClickSave = () => {
 
-		//create a copy of all restaurants
-		let p_copy = this.state.products.slice();
+		if (this.state.product.name) {
 
-		//find the index from the id
-		let index = this.state.products.findIndex(element => {
-			return(element.id === this.state.product.id)
-		});
+			//create a copy of all restaurants
+			let p_copy = this.props.appstate.products.slice();
 
-		//If restaurant is alredy in array (editing a restaurant)
-		if (index > -1) {
-			p_copy[index] = this.state.product;
-
-			const data = {
-				all: p_copy
-			}
-
-			console.log(data);
-
-
-			this.props.db.collection('lists').doc("products").set(data).then(() => {
-				alert("Modifiche Salvate");
-				this.setState({
-					viewProductsDetail: false,
-					product: null,
-					detailsSaved: true
-				});
-				this.getAllProducts();
+			//find the index from the id
+			let index = this.props.appstate.products.findIndex(element => {
+				return(element.id === this.state.product.id)
 			});
+
+			//If restaurant is alredy in array (editing a restaurant)
+			if (index > -1) {
+				p_copy[index] = this.state.product;
+
+				const data = {
+					all: p_copy
+				}
+
+				this.props.db.collection('lists').doc("products").set(data).then(() => {
+					alert("Modifiche Salvate");
+					this.setState({
+						viewProductsDetail: false,
+						product: null,
+						detailsSaved: true
+					});
+					this.props.getAllProducts();
+				});
+			} else {
+				//Add the new restaurant to array
+				p_copy.push(this.state.product);
+
+				const data = {
+					all: p_copy
+				}
+
+				this.props.db.collection('lists').doc("products").set(data).then(() => {
+					alert("Modifiche Salvate");
+					this.setState({
+						viewProductsDetail: false,
+						product: null,
+						detailsSaved: true
+					});
+
+					this.props.getAllProducts();
+				});
+			}
 		} else {
-
-			//Add the new restaurant to array
-			p_copy.push(this.state.product);
-
-			const data = {
-				all: p_copy
-			}
-
-
-			this.props.db.collection('lists').doc("products").set(data).then(() => {
-				alert("Modifiche Salvate");
-				this.setState({
-					viewProductsDetail: false,
-					product: null,
-					detailsSaved: true
-				});
-
-				this.getAllProducts();
-			});
-
-		
+			alert("Inserisci il nome del prodotto");
 		}
 	}
 
@@ -244,10 +218,10 @@ class Products extends Component {
 	handleClickDelete = () => {
 
 		//create a copy of all restaurants
-		let p_copy = this.state.products.slice();
+		let p_copy = this.props.appstate.products.slice();
 
 		//find the index from the id
-		let index = this.state.products.findIndex(element => {
+		let index = this.props.appstate.products.findIndex(element => {
 			return(element.id === this.state.product.id)
 		});
 
@@ -270,7 +244,7 @@ class Products extends Component {
 					detailsSaved: true
 				});
 
-				this.getAllProducts();
+				this.props.getAllProducts();
 			});
 		} else {
 			alert("Il prodotto non è ancora stato creato.");
@@ -322,7 +296,7 @@ class Products extends Component {
 							handleClickDelete={this.handleClickDelete}/>
 						:
 						<ProductsSummary 
-							products={this.state.products}
+							products={this.props.appstate.products}
 							handleClickProduct={this.handleClickProduct}
 							handleClickNewProduct={this.handleClickNewProduct}/>
 					}

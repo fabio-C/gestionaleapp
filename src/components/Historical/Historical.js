@@ -9,8 +9,6 @@ class Historical extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			restaurants: null, //List of all restaurants
-			products: null, //List of all products
 			orders: null, //List of all the order in the selected month
 
 			month: null,
@@ -25,39 +23,6 @@ class Historical extends Component {
 	}
 
 	componentDidMount() {
-		//Get all restaurants list
-		//Get all restaurant doc
-		this.props.db.collection("lists").doc("restaurants").get().then(doc => {
-			let restaurants = doc.data().all;
-			//Sort alphabetically
-			restaurants.sort(function(a, b){
-				if(a.name < b.name) { return -1; }
-				if(a.name > b.name) { return 1; }
-				return 0;
-			});
-			this.setState({
-				restaurants: restaurants,
-				restaurantsForChart: restaurants //initially display all restaurants
-			});
-		});
-
-		//Get all products
-		this.props.db.collection("lists").doc("products").get().then(doc => {
-			
-			let products = doc.data().all;
-
-			//Sort alphabetically
-			products.sort(function(a, b){
-				if(a.name < b.name) { return -1; }
-				if(a.name > b.name) { return 1; }
-				return 0;
-			});
-
-			this.setState({
-				products: products,
-				productsForChart: products //initially display all products
-			});
-		});
 	}
 
 	handleClickStart = () => {
@@ -76,6 +41,14 @@ class Historical extends Component {
 		const first = new Date(year, month, 1); //First day of selected month
 		var last = new Date(year, month + 1, 0); //Last day of selected month
 
+		//If list has not be initialized:
+		if ((this.state.restaurantsForChart.length === 0) || (this.state.productsForChart.length === 0)) {
+			this.setState({
+				restaurantsForChart: this.props.appstate.restaurants,
+				productsForChart: this.props.appstate.products
+			});
+		}
+
 		//Get order details
 		this.props.db.collection("orders")
 			.where("date", ">", first)
@@ -83,13 +56,11 @@ class Historical extends Component {
 			.get().then(
 			snapshot => {
 				if (snapshot.empty) {
-					console.log('Firestore Order Documents Not Found');
+					alert("Non sono stati trovati ordini nel mese selezionato.")
 					return;
 				} else {
 					
 					let orders = [];
-
-					console.log(snapshot.docs.length + " Orders Doc Found");
 
 					for (var i = 0; i < snapshot.docs.length; i++) {
 						orders.push(snapshot.docs[i].data());
@@ -120,12 +91,12 @@ class Historical extends Component {
 	restaurantSelected = (e) => {
 		if (e.target.value === "all") {
 			this.setState({
-				restaurantsForChart: this.state.restaurants
+				restaurantsForChart: this.props.appstate.restaurants
 			});	
 		} else {
 			//todo
 			this.setState({
-				restaurantsForChart: [this.state.restaurants.find(r => r.id === e.target.value)]
+				restaurantsForChart: [this.props.appstate.restaurants.find(r => r.id === e.target.value)]
 			});
 		}
 	}
@@ -133,17 +104,15 @@ class Historical extends Component {
 	productSelected = (e) => {
 		if (e.target.value === "all") {
 			this.setState({
-				productsForChart: this.state.products
+				productsForChart: this.props.appstate.products
 			});	
 		} else {
 			//todo
 			this.setState({
-				productsForChart: [this.state.products.find(p => p.id === e.target.value)]
+				productsForChart: [this.props.appstate.products.find(p => p.id === e.target.value)]
 			});
-		}
-		
+		}	
 	}
-
 
 	setModeRestaurant = (state) => {
 		this.setState({
@@ -151,11 +120,27 @@ class Historical extends Component {
 		});
 	}
 
+	handleClickDownload = (data) => {
+		console.log("handleClickDownload");
+		console.log(data);
+
+		let csvContent = "data:text/csv;charset=utf-8,Ristoranti," + data.labels.join(",") + "\r\n";
+
+		data.datasets.forEach(function(rowArray) {
+		    let row = rowArray.data.join(",");
+		    csvContent += rowArray.label + "," + row + "\r\n";
+		});
+
+		let encodedUri = encodeURI(csvContent);
+
+		window.open(encodedUri);
+	}
+
   	render(){
 
   		let restaurantsSelectDOM = null;
-  		if (this.state.restaurants) {
-  			restaurantsSelectDOM = this.state.restaurants.map(r => {
+  		if (this.props.appstate.restaurants) {
+  			restaurantsSelectDOM = this.props.appstate.restaurants.map(r => {
   				return(
   					<option value={r.id} key={r.id}>{r.name}</option>
   				)
@@ -163,8 +148,8 @@ class Historical extends Component {
   		}
 
   		let productsSelectDOM = null;
-  		if (this.state.products) {
-  			productsSelectDOM = this.state.products.map(p => {
+  		if (this.props.appstate.products) {
+  			productsSelectDOM = this.props.appstate.products.map(p => {
   				return(
   					<option value={p.id} key={p.id}>{p.name}</option>
   				)
@@ -246,7 +231,8 @@ class Historical extends Component {
 						modeRestaurant={this.state.modeRestaurant}
 
 						restaurantsForChart={this.state.restaurantsForChart}
-						productsForChart={this.state.productsForChart}/>
+						productsForChart={this.state.productsForChart}
+						handleClickDownload={this.handleClickDownload}/>
 				: null}
 			</Container>
 

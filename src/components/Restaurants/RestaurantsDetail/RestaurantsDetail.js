@@ -21,7 +21,7 @@ const RestaurantsDetail = (props) => {
 
 			  	<Col md={12} id="inputContainers"> 
 			  		
-			  		<label>{props.restaurant.id}</label>
+			  		<label id="restaurantid">{props.restaurant.id}</label>
 
 			  		<label>Nome Ristorante</label>
 			  		<input type="text" value={props.restaurant.name} id="name" onChange={props.handleChangeRestaurant}/>

@@ -8,8 +8,6 @@ class Restaurants extends Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			restaurants: null, //list of all restaurants of the platform (array)
-
 			//RestaurantDetail component
 			restaurant: null, //the selected restaurant object
 			restaurantEdited: false, //true if restaraunt data has been changed
@@ -26,35 +24,11 @@ class Restaurants extends Component {
 	}
 
 	componentDidMount() {
-		this.getAllRestaurants();
 		//this.restartList();
 	}
 
 
 	//-------------------------------------------------------------------------------
-	/*
-		getAllRestaurants
-		-----------------
-	*/
-	getAllRestaurants = () => {
-		//Get all restaurant doc
-		this.props.db.collection("lists").doc("restaurants").get().then(doc => {
-
-			let restaurants = doc.data().all;
-					
-			//Sort alphabetically
-			restaurants.sort(function(a, b){
-				if(a.name < b.name) { return -1; }
-				if(a.name > b.name) { return 1; }
-				return 0;
-			});
-
-			this.setState({
-				restaurants: restaurants
-			});
-
-		});
-	}
 
 	/*
 		restartList
@@ -95,7 +69,7 @@ class Restaurants extends Component {
 	handleClickRestaurant = (restaurantid) => {
 
 		//Retrieve the restaurant object from the array, using id
-		const r = this.state.restaurants.find(element => {
+		const r = this.props.appstate.restaurants.find(element => {
 			return (element.id === restaurantid)
 		});
 
@@ -178,52 +152,54 @@ class Restaurants extends Component {
 	*/
 	handleClickSave = () => {
 
-		//create a copy of all restaurants
-		let r_copy = this.state.restaurants.slice();
+		if (this.state.restaurant.name) {
+			//create a copy of all restaurants
+			let r_copy = this.props.appstate.restaurants.slice();
 
-		//find the index from the id
-		let index = this.state.restaurants.findIndex(element => {
-			return(element.id === this.state.restaurant.id)
-		});
-
-		//If restaurant is alredy in array (editing a restaurant)
-		if (index > -1) {
-			r_copy[index] = this.state.restaurant;
-
-			const data = {
-				all: r_copy
-			}
-
-			this.props.db.collection('lists').doc("restaurants").set(data).then(() => {
-				alert("Modifiche Salvate");
-				this.setState({
-					viewRestaurantsDetail: false,
-					restaurant: null,
-					detailsSaved: true
-				});
-				this.getAllRestaurants();
+			//find the index from the id
+			let index = this.props.appstate.restaurants.findIndex(element => {
+				return(element.id === this.state.restaurant.id)
 			});
+
+			//If restaurant is alredy in array (editing a restaurant)
+			if (index > -1) {
+				r_copy[index] = this.state.restaurant;
+
+				const data = {
+					all: r_copy
+				}
+
+				this.props.db.collection('lists').doc("restaurants").set(data).then(() => {
+					alert("Modifiche Salvate");
+					this.setState({
+						viewRestaurantsDetail: false,
+						restaurant: null,
+						detailsSaved: true
+					});
+					this.props.getAllRestaurants();
+				});
+			} else {
+
+				//Add the new restaurant to array
+				r_copy.push(this.state.restaurant);
+
+				const data = {
+					all: r_copy
+				}
+
+				this.props.db.collection('lists').doc("restaurants").set(data).then(() => {
+					alert("Modifiche Salvate");
+					this.setState({
+						viewRestaurantsDetail: false,
+						restaurant: null,
+						detailsSaved: true
+					});
+
+					this.props.getAllRestaurants();
+				});
+			}
 		} else {
-
-			//Add the new restaurant to array
-			r_copy.push(this.state.restaurant);
-
-			const data = {
-				all: r_copy
-			}
-
-			this.props.db.collection('lists').doc("restaurants").set(data).then(() => {
-				alert("Modifiche Salvate");
-				this.setState({
-					viewRestaurantsDetail: false,
-					restaurant: null,
-					detailsSaved: true
-				});
-
-				this.getAllRestaurants();
-			});
-
-		
+			alert("Inserisci un nome al Ristorante");
 		}
 	}
 
@@ -235,10 +211,10 @@ class Restaurants extends Component {
 	handleClickDelete = () => {
 
 		//create a copy of all restaurants
-		let r_copy = this.state.restaurants.slice();
+		let r_copy = this.props.appstate.restaurants.slice();
 
 		//find the index from the id
-		let index = this.state.restaurants.findIndex(element => {
+		let index = this.props.appstate.restaurants.findIndex(element => {
 			return(element.id === this.state.restaurant.id)
 		});
 
@@ -261,7 +237,7 @@ class Restaurants extends Component {
 					detailsSaved: true
 				});
 
-				this.getAllRestaurants();
+				this.props.getAllRestaurants();
 			});
 		} else {
 			alert("Il Ristorante non è ancora stato creato.");
@@ -315,7 +291,7 @@ class Restaurants extends Component {
 						handleClickDelete={this.handleClickDelete}/>
 					:
 					<RestaurantsSummary 
-						restaurants={this.state.restaurants}
+						restaurants={this.props.appstate.restaurants}
 						handleClickRestaurant={this.handleClickRestaurant}
 						handleClickNewRestaurant={this.handleClickNewRestaurant}/>
 				}

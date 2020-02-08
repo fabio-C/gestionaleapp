@@ -33,12 +33,57 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      showMobileMenu: false,
+      restaurants: null, //all restaurants list
+      products: null, //all products list
+      showMobileMenu: false
     }
   }
 
   componentDidMount() {
+    this.getAllRestaurants();
+    this.getAllProducts();
+  }
 
+  getAllRestaurants = () => {
+    //Get all restaurant doc
+    db.collection("lists").doc("restaurants").get().then(doc => {
+
+      console.log("Restaurants List Downloaded");
+
+      let restaurants = doc.data().all;
+      
+      //Sort alphabetically
+      restaurants.sort(function(a, b){
+        if(a.name < b.name) { return -1; }
+        if(a.name > b.name) { return 1; }
+        return 0;
+      });
+
+      this.setState({
+        restaurants: restaurants
+      });
+    });
+  }
+
+  getAllProducts = () => {
+    //Get all products
+    db.collection("lists").doc("products").get().then(doc => {
+      
+      console.log("Products List Downloaded");
+
+      let products = doc.data().all;
+
+      //Sort alphabetically
+      products.sort(function(a, b){
+        if(a.name < b.name) { return -1; }
+        if(a.name > b.name) { return 1; }
+        return 0;
+      });
+
+      this.setState({
+        products: products
+      });
+    });
   }
 
   /* 
@@ -72,9 +117,9 @@ class App extends Component {
         <main>
           <Switch>
               <Route path="/" exact render={(props) => <Orders {...props} appstate={this.state} db={db}/>} />
-              <Route path="/products" exact render={(props) => <Products {...props} appstate={this.state} db={db}/>} />
-              <Route path="/restaurants" exact render={(props) => <Restaurants {...props} appstate={this.state} db={db}/>} />
-              <Route path="/historical" exact render={(props) => <Historical {...props} appstate={this.state} db={db}/>} />
+              <Route path="/products" exact render={(props) => <Products {...props} appstate={this.state} db={db} getAllProducts={this.getAllProducts}/>} />
+              <Route path="/restaurants" exact render={(props) => <Restaurants {...props} appstate={this.state} db={db} getAllRestaurants={this.getAllRestaurants}/>} />
+              <Route path="/historical" exact render={(props) => <Historical {...props} appstate={this.state} db={db} />} />
             </Switch>
         </main>
         

@@ -1,3 +1,19 @@
 .HistoricalChart {
 	padding: 50px;
 }
+
+.HistoricalChart button {
+	float: right;
+}
+
+
+/* 
+  ##Device = Ony for smartphone
+*/
+
+@media (max-width: 767px) {
+	.HistoricalChart {
+		padding: 0;
+		padding-top: 20px;
+	}
+}

@@ -1,13 +1,16 @@
 import React from 'react';
-import {Row, Col} from 'react-bootstrap';
+import {Row, Col, Button} from 'react-bootstrap';
 
 import { Bar } from 'react-chartjs-2';
 import "./HistoricalChart.css";
 
 const HistoricalChart = (props) => {
 
-	//props.restaurantsForChart: list of all restaurantsForChart to display in chart
-	//props.orders: list of all the order in the selected month
+	/*
+		props.restaurantsForChart: list of all restaurants to display in chart
+		props.productsForChart: list of all restaurantsForChart to display in chart
+		props.orders: list of all the order in the selected month
+	*/
 
 	//Calculate an array of the days of a month:
 	let monthdates = null;
@@ -74,29 +77,31 @@ const HistoricalChart = (props) => {
 						let total = 0;
 						let z = 0;
 						if (props.modeRestaurant) {
-							//For each restaurants in the summary
-							for (z = 0; z < props.orders[j].restaurantSummary.length; z++) {
+							//For each restaurants in the order
+							for (z = 0; z < props.orders[j].restaurants.length; z++) {
 								//Compare restaurant id
-								if(datasets[k].id === props.orders[j].restaurantSummary[z].id){
+								if(datasets[k].id === props.orders[j].restaurants[z].id){
 									//If restaurant found, get the total
-									total = props.orders[j].restaurantSummary[z].total;
+									for (let y = 0; y < props.orders[j].restaurants[z].products.length; y++) {
+										total += props.orders[j].restaurants[z].products[y].quantity;
+									}
 								}	
 							}
 						} else {
-							//For each products in the summary
-							for (z = 0; z < props.orders[j].productSummary.length; z++) {
-								//Compare restaurant id
-								if(datasets[k].id === props.orders[j].productSummary[z].id){
-									//If product found, get the total
-									total = props.orders[j].productSummary[z].total;
-								}	
+							//For each restaurant in the order
+							for (z = 0; z < props.orders[j].restaurants.length; z++) {
+								//For each product in the restaurant
+								for (let y = 0; y < props.orders[j].restaurants[z].products.length; y++) {
+									//Compare restaurant id
+									if(datasets[k].id === props.orders[j].restaurants[z].products[y].id) {
+										total += props.orders[j].restaurants[z].products[y].quantity
+									}
+								}
 							}
 						}
 
 						//Update datasets obj
 						datasets[k].data.push(total);
-
-						//If restaurant is not found, 0 is the total
 					}
 
 				}
@@ -170,7 +175,12 @@ const HistoricalChart = (props) => {
 		  		<Bar
 					data={data}
 					options={options}/>
+
+				<Button variant="link" onClick={() => props.handleClickDownload(data)}> Scarica Dati </Button>
+
 			</Col>
+
+
 	    </Row>
 	);
 }

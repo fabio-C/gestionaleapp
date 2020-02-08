@@ -2,6 +2,12 @@
 	margin-top: 25px;
 }
 
+
+.RestaurantsDetail #inputContainers #restaurantid {
+    color: gray;
+    text-align: right;
+}
+
 .RestaurantsDetail .RestaurantDetailButtons1 {
     text-align: left;
 }

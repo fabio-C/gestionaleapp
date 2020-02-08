@@ -15,7 +15,7 @@ const OrdersNavigation = (props) => {
 		  	<Col md={12}>
 		  		<h3>Ordini <span role="img" aria-label="pack">📦</span></h3>
 			  	<DatePicker
-			        selected={props.orderDate}
+			        selected={props.selectedDate}
 			        onChange={props.handleDateChange}
 			        dateFormat="MMMM d, yyyy"
 			    />

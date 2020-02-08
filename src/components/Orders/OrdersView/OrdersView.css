@@ -1,0 +1,126 @@
+
+.OrdersView {
+
+}
+
+.OrdersView .restaurantBox{
+    border-radius: 5px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #3a506b;
+    margin-bottom: 10px;
+    font-size: large;
+    cursor: pointer;
+    color: white;
+}
+
+.OrdersView .restaurantBox span {
+	display: block;
+    width: 40px;
+    background-color: #5bc0be;
+    margin: auto;
+    color: white;
+    border-radius: 20px;
+}
+
+.OrdersView .restaurantBox.empty{
+    background-color: #18213d;
+}
+
+.OrdersView .restaurantBox.empty span {
+    color: #18213d;
+    background-color: #293350;
+}
+
+.OrdersView .productBox{
+    border-radius: 5px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    background-color: #3a506b;
+    margin-bottom: 10px;
+    font-size: large;
+    color: white;
+}
+
+.OrdersView .productBox.empty{
+    background-color: #18213d;
+}
+
+.OrdersView .productBox span {
+    display: block;
+    width: 40px;
+    background-color: #5bc0be;
+    margin: auto;
+    color: white;
+    border-radius: 20px;
+}
+
+.OrdersView .productBox.empty span {
+    color: #18213d;
+    background-color: #293350;
+}
+
+.OrdersView #toggleButtons {
+    text-align: left;
+    margin-bottom: 30px;
+}
+
+.OrdersView #toggleButtons button {
+    padding: 5px 15px;
+    background-color: transparent;
+    border: none;
+    color: white;
+    border-radius: 5px;
+}
+
+.OrdersView #toggleButtons button.focus {
+    background-color: #5BC0BE;
+}
+
+.OrdersView .lastButtons {
+    text-align: left;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+
+.OrdersView .restaurantName {
+    font-size: large;
+    color: #6FFFE9;
+}
+
+.OrdersView .productsList {
+    margin-bottom: 10px;
+}
+
+.OrdersView .productsList p span {
+    margin-left: 10px;
+}
+
+.OrdersView .productsList p {
+    font-size: large;
+    margin-bottom: 0;
+}
+
+
+/* 
+  ##Device = Ony for smartphone
+*/
+
+@media (max-width: 767px) {
+  
+    .OrdersView #toggleButtons button {
+        width: 100%;
+        padding: 15px 15px;
+    }
+
+    .OrdersDetail table .productQuantity {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .OrdersDetail table tbody tr td button {
+        height: 35px;
+        width: 35px;    
+    }
+}

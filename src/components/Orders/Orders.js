@@ -1,31 +1,32 @@
 import React, {Component} from 'react';
 
 import OrdersNavigation from './OrdersNavigation/OrdersNavigation';
-import OrdersSummary from './OrdersSummary/OrdersSummary';
+import OrdersView from './OrdersView/OrdersView';
 import OrdersDetail from './OrdersDetail/OrdersDetail';
 
 import axios from 'axios';
 
 class Orders extends Component {
 
+
 	constructor(props){
 		super(props);
 		this.state = {
 
-			order: null, //The complete order obj
+			selectedDate: null, //The selected date
+
+			order: null, //The complete order object
 			orderid: null, //ID of the order
 
-			orderDate: null, //Initial date is today
-
 			//OrdersDetail state
-			restaurant: null,
-			restaurantid: null,
+			restaurant: null, //The selected restaurant object
 			orderEdited: false, //true when change order details
 			orderSaved: false, //true if order change has been saved
+			printLoading: false, //print PDF loading state
 
-			//RENDER FLAG
-			viewOrdersDetail: false, //false: show OrdersSummary, true: show OrdersDetail
-			modeRestaurant: 0, //0: show restaurant, //1: show products, //2: show summary
+			//OrderView state
+			viewOrdersDetail: false, //false: show OrdersView, true: show OrdersDetail
+			viewMode: 0, //0: show restaurant, //1: show products, //2: show summary
 
 			//MODAL
 			showModal: false,
@@ -51,7 +52,7 @@ class Orders extends Component {
 		d.setMilliseconds(0);
 
 		this.setState({
-			orderDate: d
+			selectedDate: d
 		});
 
 		this.getOrderByDate(d);
@@ -101,86 +102,38 @@ class Orders extends Component {
 
 		//Change the state
 		this.setState({
-			orderDate: date
+			selectedDate: date,
+			viewOrdersDetail: false
 		});
 	};
 
 
-	//------------------------------------------------------------ events from OrdersSummary
+	//------------------------------------------------------------ events from OrdersView
 	
-
-	setModeRestaurant = (mode) => {
+	/*
+		setViewMode
+	*/
+	setViewMode = (mode) => {
 		this.setState({
-			modeRestaurant: mode
+			viewMode: mode
 		});
 	}
+
 	/*
 		createEmptyOrder
 	*/
 	createEmptyOrder = () => {
-		let products = null;
-		let restaurants = null;
-		//Get all product:
-		this.props.db.collection("lists").doc("products").get().then(products_doc => {
-			products = products_doc.data().all;
-			//Get all restaurants
-			this.props.db.collection("lists").doc("restaurants").get().then(restaurants_doc => {
-				restaurants = restaurants_doc.data().all;
 
-				if (products&&restaurants) {
+		//Create firestore data obj
+		let data = {
+			date: this.state.selectedDate,
+			restaurants: [] //initially empty
+		}
 
-					//Sort alphabetically
-					products.sort(function(a, b){
-						if(a.name < b.name) { return -1; }
-						if(a.name > b.name) { return 1; }
-						return 0;
-					});
-
-					//Sort alphabetically
-					restaurants.sort(function(a, b){
-						if(a.name < b.name) { return -1; }
-						if(a.name > b.name) { return 1; }
-						return 0;
-					});
-
-					//Create firestore data obj
-					let data = {
-						date: this.state.orderDate,
-						restaurantSummary: restaurants.map(function(r){
-							return(
-								{
-									id: r.id,
-									name: r.name,
-									total: 0
-								}
-							)
-						}),
-						productSummary: products.map(function(p){
-							return(
-								{
-									id: p.id,
-									name: p.name,
-									price: p.price,
-									sub:p.sub,
-									total: 0,
-									weight: p.weight,
-									iva: p.iva
-								}
-							)
-						})
-					}
-
-					//Write object in firestore
-					this.props.db.collection('orders').doc().set(data).then(ref => {
-						console.log('Added orderd document');
-
-						//Refresh and show new empty order
-						this.getOrderByDate(this.state.orderDate);
-					});
-				}
-
-			});
-
+		//Write object in firestore
+		this.props.db.collection('orders').doc().set(data).then(ref => {
+			//Refresh and show new empty order
+			this.getOrderByDate(this.state.selectedDate);
 		});
 	}
 
@@ -189,64 +142,23 @@ class Orders extends Component {
 	*/
 	handleClickRestaurant = (restaurantid, restaurantname) => {
 
-		//Get order details
-		this.props.db.collection("orders").doc(this.state.orderid).collection("restaurants").doc(restaurantid).get().then( doc => {
-			
-			//Check if DOC exist
-			if (!doc.exists) {
-				//If restaurant document not exist, create one:
-				console.log('Restaurant details DOC not found. Creating one:');
+		//Find the restaurant, from the order
+		let selectedRestaurant = this.state.order.restaurants.find(r => r.id === restaurantid);
 
-				//Get list of all products
-				let products = null;
-				this.props.db.collection("lists").doc("products").get().then(products_doc => {
-					
-					products = products_doc.data().all;
-					
-					//Sort list alphabetically
-					products.sort(function(a, b){
-						if(a.name < b.name) { return -1; }
-						if(a.name > b.name) { return 1; }
-						return 0;
-					});
-
-					//Create firestore object
-					let data = {
-						name: restaurantname,
-						date:this.state.orderDate,
-						products: products.map(function(p){
-							return(
-								{
-									id: p.id,
-									name: p.name,
-									price: p.price,
-									sub:p.sub,
-									quantity: 0,
-									weight: p.weight,
-									iva: p.iva
-								}
-							)
-						})
-					}
-
-					//Write DOC to firestore
-					this.props.db.collection('orders').doc(this.state.orderid).collection("restaurants").doc(restaurantid).set(data).then(ref => {
-						console.log("New DOC inserted.");
-
-						//Call this function recorsivly...
-						this.handleClickRestaurant(restaurantid, restaurantname);
-
-					});
-				});
-			} else {
-
-				this.setState({
-					restaurant: doc.data(),
-					restaurantid: restaurantid,
-					viewOrdersDetail: true
-				});
+		//If the restaurant does't exist in the order, create an empty one
+		if (!selectedRestaurant) {
+			selectedRestaurant = {
+				id: restaurantid,
+				products: []
 			}
+		}
+		
+		this.setState({
+			restaurant: selectedRestaurant,
+			viewOrdersDetail: true
 		});
+
+		window.scrollTo(0,0);
 	}
 
 	/*
@@ -255,7 +167,7 @@ class Orders extends Component {
 	handleClickDelete = () => {
 		this.props.db.collection('orders').doc(this.state.orderid).delete().then(() => {
 			alert("Ordine Eliminato");
-			this.getOrderByDate(this.state.orderDate);
+			this.getOrderByDate(this.state.selectedDate);
 		});
 	}
 
@@ -265,7 +177,6 @@ class Orders extends Component {
 		handleClickBack
 	*/
 	handleClickBack = () => {
-
 		if ((this.state.orderEdited)&&(!this.state.orderSaved)) {
 			this.setState({
 				showModal: true,
@@ -273,34 +184,45 @@ class Orders extends Component {
 				modalBody: "Alcune modifiche non sono state salvate."
 			});
 		} else {
-
-			this.getOrderByDate(this.state.orderDate);
-
 			//Go back
 			this.setState({
-				viewOrdersDetail: false,
-				restaurant: null
+				viewOrdersDetail: false
 			});
 		}
 	}
 
+	/*
+		handleClickEditProduct
+	*/
 	handleClickEditProduct = (productid, operation) => {
 
-		//Copy the obj
+		//Copy the restaurant obj
 		let r_copy = {...this.state.restaurant}; //Use slice to create a copy
 		
-		//Find the index of products array
-		const index = r_copy.products.findIndex(function(element, index, array){
-			return element.id === productid;
+		//Find the index of product in the restaurant object
+		const index = r_copy.products.findIndex(function(p, index, array){
+			return p.id === productid;
 		});
-	
-		if (operation === "add") {
-			r_copy.products[index].quantity = this.state.restaurant.products[index].quantity + 1;
-		} else if (operation === "subtract") {
-			//avoid negative numbers
-			if(this.state.restaurant.products[index].quantity>0){
-				r_copy.products[index].quantity = this.state.restaurant.products[index].quantity - 1;				
+
+		//If product exist
+		if (index >= 0) {
+			if (operation === "add") {
+				r_copy.products[index].quantity = this.state.restaurant.products[index].quantity + 1;
+			} else if (operation === "subtract") {
+				//avoid negative numbers
+				if(this.state.restaurant.products[index].quantity>1){
+					r_copy.products[index].quantity = this.state.restaurant.products[index].quantity - 1;				
+				} else if(this.state.restaurant.products[index].quantity===1){
+					//If quantity reach 0, remove it
+					r_copy.products.splice(index, 1);
+				}
 			}
+		} else {
+			//If product does not exist, push a new one
+			r_copy.products.push({
+				id: productid,
+				quantity: 1
+			});
 		}
 
 		this.setState({
@@ -309,49 +231,76 @@ class Orders extends Component {
 		});
 	}
 
+	/*
+		handleClickSave
+	*/
 	handleClickSave = () => {
+
+		//Create a copy of the order
+		let newOrder = {... this.state.order}
+
+		//Find the index of the restaurant edited
+		let index = newOrder.restaurants.findIndex(r => r.id === this.state.restaurant.id);
+
+		//If restaurant alredy exist
+		if (index >= 0) {
+			newOrder.restaurants[index] = this.state.restaurant
+		} else {
+			//If not exist push a new one
+			newOrder.restaurants.push(this.state.restaurant)
+		}
+
 		//Write DOC to firestore
-		this.props.db.collection('orders').doc(this.state.orderid).collection("restaurants").doc(this.state.restaurantid).set(this.state.restaurant).then(ref => {
+		this.props.db.collection('orders').doc(this.state.orderid).set(newOrder).then(ref => {
 			
 			alert("Dettagli Ordine Salvati.");
 			
-			//Call this function recorsivly...
 			this.setState({
+				order: newOrder,
 				orderSaved: true,
-				orderEdited: false,
-				//viewOrdersDetail: false,
-				//restaurant: null
-			});
-
-			/*
-
-			*/
-			
+				orderEdited: false
+			});			
 		});
 	}
 
+	/*
+		handleClickPrint
+	*/
 	handleClickPrint = () => {
 
-		if (this.state.orderid && this.state.restaurantid) {
-			axios.get('https://europe-west2-gestionalethecircle.cloudfunctions.net/createOrderPDF?orderid=' + this.state.orderid + '&restaurantid=' + this.state.restaurantid)
+		this.setState({
+			printLoading: true
+		});
+
+		if (this.state.orderid && this.state.restaurant) {
+			console.log("Print");
+			axios.get('https://europe-west2-gestionalethecircle.cloudfunctions.net/createOrderPDF?orderid=' + this.state.orderid + '&restaurantid=' + this.state.restaurant.id)
 	      	.then(res => {
 	      		if (res.data.status === "ok") {
 	      			window.open(res.data.url, '_blank').focus();
 	      		} else {
 	      			alert("Ops. Errore in fase di stampa. Contattare qualcuno bravo.")
 	      		}
-	      		
+
+	      		this.setState({
+					printLoading: false
+				});
 	        });	
 		}
-		
 	}
 
+	/*
+		handleModalHide
+	*/
 	handleModalHide = () => {
 		this.setState({
 			showModal: false
 		});
 	}
 
+	/*
+		handleModalConfirm
+	*/
 	handleModalConfirm = () => {
 		//Go back
 		this.setState({
@@ -362,6 +311,20 @@ class Orders extends Component {
 		});
 	}
 
+	//------------------------------------------------------------------- utility functions
+	/*
+		getRestaurantInfoFromId
+	*/
+	getRestaurantInfoFromId = (restaurantid) => {
+		return this.props.appstate.restaurants.find(r => r.id === restaurantid);
+	} 
+
+	/*
+		getProductInfoFromId
+	*/
+	getProductInfoFromId = (productid) => {
+		return this.props.appstate.products.find(p => p.id === productid);
+	} 
 
 	//------------------------------------------------------------------------------ render
 	render(){
@@ -369,32 +332,42 @@ class Orders extends Component {
 			<div className="Orders">
 
 				<OrdersNavigation 
-					orderDate={this.state.orderDate}
+					selectedDate={this.state.selectedDate}
 					handleDateChange={this.handleDateChange}/>
 
 				{
 					this.state.viewOrdersDetail?
 					<OrdersDetail 
 						restaurant={this.state.restaurant}
+						products={this.props.appstate.products}
 						orderEdited={this.state.orderEdited}
-						handleClickSave={this.handleClickSave}
-						handleClickBack={this.handleClickBack}
-						handleClickEditProduct={this.handleClickEditProduct}
+						printLoading={this.state.printLoading}
 
-						handleClickPrint={this.handleClickPrint}
 						showModal={this.state.showModal}
 						modalBody={this.state.modalBody}
 						modalTitle={this.state.modalTitle}
+
+						handleClickSave={this.handleClickSave}
+						handleClickBack={this.handleClickBack}
+						handleClickEditProduct={this.handleClickEditProduct}
+						handleClickPrint={this.handleClickPrint}
 						handleModalHide={this.handleModalHide}
 						handleModalConfirm={this.handleModalConfirm}
-						/>
-					: <OrdersSummary 
+						getRestaurantInfoFromId={this.getRestaurantInfoFromId}
+						getProductInfoFromId={this.getProductInfoFromId}
+					/>
+					: <OrdersView 
 						order={this.state.order}
-						modeRestaurant={this.state.modeRestaurant}
-						setModeRestaurant={this.setModeRestaurant}
+						restaurants={this.props.appstate.restaurants}
+						products={this.props.appstate.products}
+						viewMode={this.state.viewMode}
+
+						setViewMode={this.setViewMode}
 						handleClickNewOrder={this.createEmptyOrder}
 						handleClickRestaurant={this.handleClickRestaurant}
-						handleClickDelete={this.handleClickDelete}/>
+						handleClickDelete={this.handleClickDelete}
+						getRestaurantInfoFromId={this.getRestaurantInfoFromId}
+						getProductInfoFromId={this.getProductInfoFromId}/>
 				}
 			</div>
 

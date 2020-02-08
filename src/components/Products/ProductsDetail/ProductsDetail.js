@@ -21,7 +21,7 @@ const ProductsDetail = (props) => {
 
 			  	<Col md={12} id="inputContainers"> 
 
-			  		<label>ID Prodotto: {props.product.id}</label>
+			  		<label id="productid">{props.product.id}</label>
 			  		
 			  		<label>Nome Prodotto</label>
 			  		<input type="text" value={props.product.name} id="name" onChange={props.handleChangeProduct}/>			  		

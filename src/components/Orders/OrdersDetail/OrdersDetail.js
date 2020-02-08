@@ -5,7 +5,17 @@ import './OrdersDetail.css';
 const OrdersDetail = (props) => {
 
 	let productListDOM = null;
-	productListDOM = props.restaurant.products.map((product, index) => {
+
+	productListDOM = props.products.map((product, index) => {
+
+		let quantity = 0;
+
+		for (var i = 0; i < props.restaurant.products.length; i++) {
+			if(props.restaurant.products[i].id === product.id){
+				quantity = props.restaurant.products[i].quantity;
+			}
+		}
+
 		return(
 			<tr key={index}>
 				<td className="td_name">{product.name}</td>
@@ -14,7 +24,7 @@ const OrdersDetail = (props) => {
 						<button onClick={() => props.handleClickEditProduct(product.id, "subtract")}> - </button>
 					</div>
 					<div className="productQuantity">
-						{product.quantity}
+						{quantity}
 					</div>
 					<div>
 						<button onClick={() => props.handleClickEditProduct(product.id, "add")}> + </button>
@@ -24,6 +34,7 @@ const OrdersDetail = (props) => {
 		)
 	});
 
+	/*
 	//Calculate total and totaleuro
 	//let total = 0;
 	let totaleuro = 0;
@@ -31,17 +42,22 @@ const OrdersDetail = (props) => {
 		//total += props.restaurant.products[i].quantity;
 		totaleuro += props.restaurant.products[i].price*props.restaurant.products[i].quantity;
 	}
+	*/
+
+	//additional class for print button:
+	let print_classes = ""
+	if (props.printLoading) {
+		print_classes = "wait";
+	}
 
 	return (
 		<Container className="OrdersDetail">
 
 			<Row>
 				<Col md={12}> 
-					<h3> Ristorante: {props.restaurant.name} </h3> 
-					<h5> Totale Euro: {totaleuro} </h5>
+					<h3> Ristorante: {props.getRestaurantInfoFromId(props.restaurant.id).name} </h3> 
 				</Col>
 			</Row>
-
 
 			<Row>
 				<Col md={6} className="OrdersDetailButtons1"> 
@@ -49,7 +65,7 @@ const OrdersDetail = (props) => {
 				</Col>
 				<Col md={6} className="OrdersDetailButtons2"> 
 					<Button onClick={props.handleClickSave} disabled={!props.orderEdited}> Salva </Button> 
-					<Button onClick={props.handleClickPrint} disabled={props.orderEdited}> Stampa Fattura </Button> 
+					<Button className={print_classes} onClick={props.handleClickPrint} disabled={props.orderEdited || props.printLoading}> Stampa Fattura </Button> 
 				</Col> 
 			</Row>
 

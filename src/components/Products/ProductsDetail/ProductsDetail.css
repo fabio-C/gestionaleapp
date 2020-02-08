@@ -2,6 +2,11 @@
 	margin-top: 25px;
 }
 
+.ProductsDetail #inputContainers #productid {
+    color: gray;
+    text-align: right;
+}
+
 .ProductsDetail .ProductDetailButtons1 {
     text-align: left;
 }
