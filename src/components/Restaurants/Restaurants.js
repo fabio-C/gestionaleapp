@@ -35,7 +35,6 @@ class Restaurants extends Component {
 		-----------------
 		Utility function, for rewrite restaurants list manually.
 	*/
-	/*
 	restartList = () => {
 		const restaurantNames = ["Il Pagliaccio", "Zia", "Vyta", "Belvedere", "Magnolia Eventi", "Forme Osteria", "Banco", "Bir and food", "Angelina Testaccio", "Caronte", "Il giglio", "Cacciani", "Mezzo", "Luciano Cucina Italiana", "Barred", "Vyta2", "Matiere", "Palmerie", "Claudio Carfagna", "Amedeo", "Acquolina", "Roscioli", "Antico Arco", "Ginger1", "Ginger2", "Pesciolino", "Jacopa", "Hotel Valadier", "Antica fonderia", "Livello1",  "Proloco trastevere", "Pane e tempesta", "Creta Osteria", "Barbieri 23", "Taverna Angelica", "Angelina2", "Seu pizzeria", "Archivolto", "Bunker", "PianoStrada", "Sciccherie", "Emme", "Drink Kong", "Dalu", "Caffè Marziali 22", "All’oro", "Glass", "Paca"];
 
@@ -47,7 +46,8 @@ class Restaurants extends Component {
 						name: name,
 						iva: "",
 						address: "",
-						invoiceto:""
+						invoiceto:"",
+						email: ""
 					}
 				)
 			})
@@ -56,8 +56,7 @@ class Restaurants extends Component {
 		this.props.db.collection('lists').doc("restaurants").set(data).then(() => {
 			console.log("Restaurant Restart");
 		});
-	} 
-	*/
+	}
 
 	//---------------------------------------------------- events from RestaurantsSummary
 

@@ -13,9 +13,10 @@ class Historical extends Component {
 
 			month: null,
 			year: 2020,
-			modeRestaurant: true, //Show restaurant chart
+			historicalMode: 0, //0,1,2
 
 			//Chart
+			restaurantsSelectedId: null, //id of the selected restaurant (used by download detail)
 			restaurantsForChart: [], //List of the restaurant to display. Can be one or all.
 			productsForChart: [], //List of the restaurant to display. Can be one or all.
 			displayChart: false //FLAG
@@ -25,7 +26,12 @@ class Historical extends Component {
 	componentDidMount() {
 	}
 
-	handleClickStart = () => {
+	handleClickVisualize = () => {
+		//Get all orders
+		this.getOrdersByMonth(this.state.month, this.state.year);
+	}
+
+	handleClickDetail = () => {
 		//Get all orders
 		this.getOrdersByMonth(this.state.month, this.state.year);
 	}
@@ -41,12 +47,22 @@ class Historical extends Component {
 		const first = new Date(year, month, 1); //First day of selected month
 		var last = new Date(year, month + 1, 0); //Last day of selected month
 
-		//If list has not be initialized:
-		if ((this.state.restaurantsForChart.length === 0) || (this.state.productsForChart.length === 0)) {
-			this.setState({
-				restaurantsForChart: this.props.appstate.restaurants,
-				productsForChart: this.props.appstate.products
-			});
+		if (this.state.historicalMode === 0) {
+			//If list has not be initialized:
+			if (this.state.restaurantsForChart.length === 0) {
+				this.setState({
+					restaurantsForChart: this.props.appstate.restaurants
+				});
+			}
+		} else if (this.state.historicalMode === 1) {
+			//If list has not be initialized:
+			if (this.state.productsForChart.length === 0) {
+				this.setState({
+					productsForChart: this.props.appstate.products
+				});
+			}
+		} else if (this.state.historicalMode === 2) {
+
 		}
 
 		//Get order details
@@ -66,12 +82,138 @@ class Historical extends Component {
 						orders.push(snapshot.docs[i].data());
 					};
 
-					this.setState({
-						orders: orders,
-						displayChart: true
-					});
+					if((this.state.historicalMode === 0)||(this.state.historicalMode === 1)) {
+						console.log("asdfasdf1");
+						this.setState({
+							orders: orders,
+							displayChart: true
+						});
+					} else {
+						this.downloadDetail(orders)
+					}
+					
 				}
 			});
+	}
+
+	//This founction download the CSV of orders of an entire month of a single restaurant, with product details:
+	/*
+	Example:
+	Products,1,2,3,4,5,6,7,8,9,....
+	Acetosa,1,1,0,0,0,0,0,0,0,0,...
+	Acetosella,0,0,0,0,0,10,0,2,...
+	....
+	Total,2,2,2,2,2,
+	*/
+	downloadDetail = (orders) => {
+
+		//Create the array of monthdates. Example: [Date, Date, Date, Date, ecc]
+		let monthdates = null;
+		if ((this.state.month !== null) && this.state.year) {
+			monthdates = getDaysArray(new Date(this.state.year, this.state.month, 1), new Date(this.state.year, this.state.month + 1, 0));
+		}
+		
+		//Array of days number. Example: [1,2,3,4,5,6,7,ecc]
+		let days = [];
+
+		/*
+		//Create the array of products. Initially only with the name.
+		//Example:
+			[
+				[Acetosa],
+				[Acetosella],
+				[Rucola],
+				...
+			]
+		*/
+		let productRows = [];
+		for (let p = 0; p < this.props.appstate.products.length; p++) { //For each product:
+			productRows.push([this.props.appstate.products[p].name])
+		}
+
+		//Create the last row of the table, containing the totals. Example: [Total,0,0,0,2,3,3]
+		let totalRow = ["total"]
+
+		//For each days of the month
+		for (let i = 0; i < monthdates.length; i++) {
+			
+			//Calculate the total of the day
+			let totalOdDay = 0;
+
+			//Find the order of the day
+			const order = orders.find(o => o.date.seconds*1000 === monthdates[i].getTime())
+			
+			//Add month number to labels
+			days.push(monthdates[i].getDate());
+
+			//For each product:
+			for (let j = 0; j < this.props.appstate.products.length; j++) {				
+
+				//If order found
+				if (order) {
+					
+					//Check if the selected restaurant is inside the order
+					const restaurant = order.restaurants.find(r => r.id === this.state.restaurantsSelectedId);
+
+					//Restaurant found
+					if (restaurant) {
+
+						//Restaurant has ordered something. Check if there is the specific product:					
+						const product = restaurant.products.find(p => p.id === this.props.appstate.products[j].id);
+
+						//Product found
+						if (product) {
+							//Add the correspective quantity
+							productRows[j].push(product.quantity);
+
+							//Sum the total
+							totalOdDay += product.quantity;
+						} else {
+							//Product not found
+							productRows[j].push(0);
+						}
+					} else {
+						//Restaurant has not order anything this day
+						productRows[j].push(0)
+					}
+				} else {
+					//There are not orders in the selected day
+					productRows[j].push(0)
+				}
+
+			}
+
+			//Push the total:
+			totalRow.push(totalOdDay);
+		}
+
+		//Create CSV
+		let csvContent = "data:text/csv;charset=utf-8,Prodotti," + days.join(",") + ",tot" + "\r\n";
+		
+		//Add the rows to CSV		
+		productRows.forEach(function(row) {
+			//Total calculation
+		    let tot = 0;
+		    for (var i = 1; i < row.length; i++) {
+		    	tot += row[i]
+		    }
+		    csvContent += row.join(",") + "," + tot + "\r\n";
+		});
+
+		//Attach the totals row
+		csvContent += totalRow.join(",") + "\r\n";
+
+		let encodedUri = encodeURI(csvContent);
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+
+		//Check if the selected restaurant is inside the order
+		const restaurantName = this.props.appstate.restaurants.find(r => r.id === this.state.restaurantsSelectedId).name;
+		const filename = restaurantName + "_" + (this.state.month + 1) + "_" + this.state.year + ".csv";
+		link.setAttribute("download", filename);
+		document.body.appendChild(link); // Required for FF
+		link.click(); // This will download the data file named "my_data.csv".
+
 	}
 
 	monthSelected = (e) => {
@@ -91,12 +233,13 @@ class Historical extends Component {
 	restaurantSelected = (e) => {
 		if (e.target.value === "all") {
 			this.setState({
-				restaurantsForChart: this.props.appstate.restaurants
+				restaurantsForChart: this.props.appstate.restaurants,
+				restaurantsSelectedId: "all"
 			});	
 		} else {
-			//todo
 			this.setState({
-				restaurantsForChart: [this.props.appstate.restaurants.find(r => r.id === e.target.value)]
+				restaurantsForChart: [this.props.appstate.restaurants.find(r => r.id === e.target.value)],
+				restaurantsSelectedId: e.target.value
 			});
 		}
 	}
@@ -114,26 +257,41 @@ class Historical extends Component {
 		}	
 	}
 
-	setModeRestaurant = (state) => {
+	sethistoricalMode = (state) => {
 		this.setState({
-			modeRestaurant: state
+			historicalMode: state
 		});
 	}
 
 	handleClickDownload = (data) => {
-		console.log("handleClickDownload");
-		console.log(data);
 
-		let csvContent = "data:text/csv;charset=utf-8,Ristoranti," + data.labels.join(",") + "\r\n";
+		let csvContent = null;
+		if (this.state.historicalMode === 0) {
+			csvContent = "data:text/csv;charset=utf-8,Ristoranti," + data.labels.join(",") + ",tot" + "\r\n";
+		} else if (this.state.historicalMode === 1) {
+			csvContent = "data:text/csv;charset=utf-8,Prodotti," + data.labels.join(",") + ",tot" + "\r\n";
+		}
+
 
 		data.datasets.forEach(function(rowArray) {
 		    let row = rowArray.data.join(",");
-		    csvContent += rowArray.label + "," + row + "\r\n";
+		    let tot = 0;
+		    for (var i = 0; i < rowArray.data.length; i++) {
+		    	tot += rowArray.data[i]
+		    }
+		    csvContent += rowArray.label + "," + row + "," + tot + "\r\n";
 		});
 
-		let encodedUri = encodeURI(csvContent);
 
-		window.open(encodedUri);
+		let encodedUri = encodeURI(csvContent);
+		var link = document.createElement("a");
+		link.setAttribute("href", encodedUri);
+		const filename = (this.state.month + 1) + "_" + this.state.year + "_dati_gestionale.csv"
+		link.setAttribute("download", filename);
+		document.body.appendChild(link); // Required for FF
+		link.click(); // This will download the data file named "my_data.csv".
+
+		//window.open(encodedUri);
 	}
 
   	render(){
@@ -159,26 +317,34 @@ class Historical extends Component {
   		//buttons classes
 		let button_r_classes = null;
 		let button_p_classes = null;
-		if (this.state.modeRestaurant) {
+		let button_q_classes = null;
+		if (this.state.historicalMode === 0) {
 			button_r_classes = "focus";
 			button_p_classes = "";
-		} else {
+			button_q_classes = "";
+		} else if (this.state.historicalMode === 1) {
 			button_r_classes = "";
 			button_p_classes = "focus";
+			button_q_classes = "";
+		} else if (this.state.historicalMode === 2) {
+			button_r_classes = "";
+			button_p_classes = "";
+			button_q_classes = "focus";
 		}
 
     	return (
     		<Container className="Historical">
 	      		<Row>
 	      			<Col md={12}>
-				  		<h3> Storici Dati <span role="img" aria-label="book">📚</span> </h3>
+				  		<h3> Registro Dati <span role="img" aria-label="book">📚</span> </h3>
 				  		<p> Seleziona Mese, Anno e Ristorante per visualizzare l'andamento degli ordini o dei prodotti.</p>
 				  		<hr></hr>
 				  	</Col>
 
 				  	<Col md={12} id="toggleButtons">
-						<button className={button_r_classes} onClick={() => this.setModeRestaurant(true)} > Storico Ristoranti <span role="img" aria-label="restaurant">🍝</span> </button>
-						<button className={button_p_classes} onClick={() => this.setModeRestaurant(false)} > Storico Prodotti <span role="img" aria-label="green">🌿</span> </button>
+						<button className={button_r_classes} onClick={() => this.sethistoricalMode(0)} > Dati Ristoranti <span role="img" aria-label="restaurant">🍝</span> </button>
+						<button className={button_p_classes} onClick={() => this.sethistoricalMode(1)} > Dati Prodotti <span role="img" aria-label="green">🌿</span> </button>
+						<button className={button_q_classes} onClick={() => this.sethistoricalMode(2)} > Dettaglio Ristorante <span role="img" aria-label="green">📋</span> </button>
 					</Col>
 
 			  		<Col md={12} id="selectButtons">
@@ -205,20 +371,33 @@ class Historical extends Component {
 						  <option value={2023}>2023</option>
 						</select>
 
-						{this.state.modeRestaurant?
+						{(this.state.historicalMode === 0) ?
 							<select onChange={this.restaurantSelected}>
 							  <option value="all">Tutti i ristoranti</option>
 							  {restaurantsSelectDOM}
 							</select>
-						: 
+						: null}
+
+						{(this.state.historicalMode === 1) ?
 							<select onChange={this.productSelected}>
 							  <option value="all">Tutti i prodotti</option>
 							  {productsSelectDOM}
 							</select>
-						}
+						: null}
 
-						<Button variant="primary" onClick={this.handleClickStart} disabled={this.state.month === null}> Avvia ricerca </Button>
-			  		
+						{(this.state.historicalMode === 2) ?
+							<select onChange={this.restaurantSelected}>
+							<option value="DEFAULT" disabled>Seleziona un ristorante</option>
+							  {restaurantsSelectDOM}
+							</select>
+						: null}
+
+
+						{((this.state.historicalMode === 0)||(this.state.historicalMode === 1)) ?
+							<Button variant="primary" onClick={this.handleClickVisualize} disabled={this.state.month === null}> Visualizza </Button>
+						:
+			  				<Button variant="primary" onClick={this.handleClickDetail} disabled={(this.state.month === null)||(this.state.restaurantsSelectedId === null)}> Scarica </Button>
+			  			}
 			  		</Col>
 			    </Row>
 
@@ -228,7 +407,7 @@ class Historical extends Component {
 						month={this.state.month}
 						year={this.state.year}
 
-						modeRestaurant={this.state.modeRestaurant}
+						historicalMode={this.state.historicalMode}
 
 						restaurantsForChart={this.state.restaurantsForChart}
 						productsForChart={this.state.productsForChart}
@@ -242,3 +421,6 @@ class Historical extends Component {
 }
 
 export default Historical;
+
+
+var getDaysArray = function(s,e) {for(var a=[],d=s;d<=e;d.setDate(d.getDate()+1)){ a.push(new Date(d));}return a;};

@@ -34,6 +34,9 @@ const RestaurantsDetail = (props) => {
 			  		
 			  		<label>Destinatario fattura</label>
 			  		<input type="text" value={props.restaurant.invoiceto} id="invoiceto" onChange={props.handleChangeRestaurant}/>
+
+			  		<label>Email</label>
+			  		<input type="text" value={props.restaurant.email} id="email" onChange={props.handleChangeRestaurant}/>
 			  		
 			  	</Col>
 		  	</Row>

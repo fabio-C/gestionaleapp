@@ -24,7 +24,7 @@ const HistoricalChart = (props) => {
 
 	//Create the structure of datasets, with restaurant name, and empty data
 	let i = 0;
-	if (props.modeRestaurant) {
+	if (props.historicalMode === 0) {
 		for (i = 0; i < props.restaurantsForChart.length; i++) {
 			datasets.push(
 				{
@@ -35,7 +35,7 @@ const HistoricalChart = (props) => {
 			    }
 			)
 		}
-	} else {
+	} else if (props.historicalMode === 1) {
 		for (i = 0; i < props.productsForChart.length; i++) {
 			datasets.push(
 				{
@@ -76,7 +76,7 @@ const HistoricalChart = (props) => {
 						
 						let total = 0;
 						let z = 0;
-						if (props.modeRestaurant) {
+						if (props.historicalMode === 0) {
 							//For each restaurants in the order
 							for (z = 0; z < props.orders[j].restaurants.length; z++) {
 								//Compare restaurant id
@@ -87,7 +87,7 @@ const HistoricalChart = (props) => {
 									}
 								}	
 							}
-						} else {
+						} else if (props.historicalMode === 1) {
 							//For each restaurant in the order
 							for (z = 0; z < props.orders[j].restaurants.length; z++) {
 								//For each product in the restaurant

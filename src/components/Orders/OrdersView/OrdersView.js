@@ -14,7 +14,8 @@ const OrdersView = (props) => {
 		//Depending on viewMode display a different UI and data
 		//0: Vista Ristoranti
 		//1: Vista Prodotti
-		//2: Riepilogo
+		//2: Riepilogo Ristoranti
+		//3: Riepilogo Prodotti
 		if (props.viewMode === 0) { //Vista Ristoranti
 			if (props.restaurants) {
 
@@ -79,7 +80,7 @@ const OrdersView = (props) => {
 					)
 				});
 			}
-		} else if (props.viewMode === 2) { //Riepilogo
+		} else if (props.viewMode === 2) { //Riepilogo Ristoranti
 
 			//Loop all restaurant in order
 			orderViewDOM = props.order.restaurants.map((restaurant, index) => {
@@ -91,21 +92,88 @@ const OrdersView = (props) => {
 
 				for (var i = 0; i < restaurant.products.length; i++) {
 					productsList.push(
-						<p key={i + "_2"}>
+						<p key={i + "_2"} name={props.getProductInfoFromId(restaurant.products[i].id).name}>
 							{props.getProductInfoFromId(restaurant.products[i].id).name}
 							<span>{restaurant.products[i].quantity}</span>
 						</p>
 					)
 				}
+				
+				//Sort product in list alphabetically
+			    productsList.sort(function(a, b){
+			    	if(a.props.name < b.props.name) { return -1; }
+			        if(a.props.name > b.props.name) { return 1; }
+			    	return 0;
+			    });
 
 				return(
-					<Col md={12} key={index}>
-						<div className="restaurantName">{restaurantName}</div>
-						<div className="productsList">{productsList}</div>
+					<Col md={12} key={index} name={restaurantName}>
+						<div className="resumeName">{restaurantName}</div>
+						<div className="resumeList">{productsList}</div>
 					</Col>
 				)
-				
 			});
+
+			//Sort the resume by restaurant name
+			orderViewDOM.sort(function(a, b){
+			  	if(a.props.name < b.props.name) { return -1; }
+			    if(a.props.name > b.props.name) { return 1; }
+			  	return 0;
+			});
+
+		} else if (props.viewMode === 3) { //Riepilogo Prodotti
+
+			orderViewDOM = [];
+
+			//Loop all products in order
+			props.products.forEach((product, index) => {
+
+				let restaurantList = [];
+
+				let productFound = false;
+
+				for (var i = 0; i < props.order.restaurants.length; i++) {
+
+					for (var j = 0; j < props.order.restaurants[i].products.length; j++) {
+						if (props.order.restaurants[i].products[j].id === product.id) {
+
+							productFound = true;
+
+							restaurantList.push(
+								<p key={i.toString() + j.toString()} name={props.getRestaurantInfoFromId(props.order.restaurants[i].id).name}>
+									{props.getRestaurantInfoFromId(props.order.restaurants[i].id).name}
+									<span>{props.order.restaurants[i].products[j].quantity}</span>
+								</p>
+							)
+						}
+					}
+				}
+
+				//Sort restaurant in list alphabetically
+			    restaurantList.sort(function(a, b){
+			    	if(a.props.name < b.props.name) { return -1; }
+			        if(a.props.name > b.props.name) { return 1; }
+			    	return 0;
+			    });
+
+				if (productFound) {
+					orderViewDOM.push(
+						<Col md={12} key={index} name={product.name}>
+							<div className="resumeName">{product.name}</div>
+							<div className="resumeList">{restaurantList}</div>
+						</Col>
+					)	
+				}
+			});
+
+			//Sort the resume by products name
+			orderViewDOM.sort(function(a, b){
+			  	if(a.props.name < b.props.name) { return -1; }
+			    if(a.props.name > b.props.name) { return 1; }
+			  	return 0;
+			});
+
+
 		}
 	}
 
@@ -113,18 +181,27 @@ const OrdersView = (props) => {
 	let button_r_classes = null;
 	let button_p_classes = null;
 	let button_s_classes = null;
+	let button_h_classes = null;
 	if (props.viewMode === 0) {
 		button_r_classes = "focus";
 		button_p_classes = "";
 		button_s_classes = "";
+		button_h_classes = "";
 	} else if (props.viewMode === 1) {
 		button_r_classes = "";
 		button_p_classes = "focus";
 		button_s_classes = "";
+		button_h_classes = "";
 	} else if (props.viewMode === 2) {
 		button_r_classes = "";
 		button_p_classes = "";
 		button_s_classes = "focus";
+		button_h_classes = "";
+	} else if (props.viewMode === 3) {
+		button_r_classes = "";
+		button_p_classes = "";
+		button_s_classes = "";
+		button_h_classes = "focus";
 	}
 
 	return (
@@ -138,7 +215,8 @@ const OrdersView = (props) => {
 			  		<Col md={12} id="toggleButtons">
 						<button className={button_r_classes} onClick={() => props.setViewMode(0)} > Vista Ristoranti <span role="img" aria-label="restaurant">🍝</span> </button>
 						<button className={button_p_classes} onClick={() => props.setViewMode(1)} > Vista Prodotti <span role="img" aria-label="leaf">🌿</span> </button>
-						<button className={button_s_classes} onClick={() => props.setViewMode(2)} > Riepilogo <span role="img" aria-label="leaf">📋</span> </button>
+						<button className={button_s_classes} onClick={() => props.setViewMode(2)} > Riepilogo Ristoranti <span role="img" aria-label="leaf">📋</span> </button>
+						<button className={button_h_classes} onClick={() => props.setViewMode(3)} > Riepilogo Prodotti <span role="img" aria-label="leaf">📋</span> </button>
 					</Col>
 
 			  		{orderViewDOM}

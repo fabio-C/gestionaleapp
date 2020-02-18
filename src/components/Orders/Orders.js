@@ -237,7 +237,7 @@ class Orders extends Component {
 	handleClickSave = () => {
 
 		//Create a copy of the order
-		let newOrder = {... this.state.order}
+		let newOrder = {...this.state.order}
 
 		//Find the index of the restaurant edited
 		let index = newOrder.restaurants.findIndex(r => r.id === this.state.restaurant.id);
@@ -316,14 +316,28 @@ class Orders extends Component {
 		getRestaurantInfoFromId
 	*/
 	getRestaurantInfoFromId = (restaurantid) => {
-		return this.props.appstate.restaurants.find(r => r.id === restaurantid);
+		const info = this.props.appstate.restaurants.find(r => r.id === restaurantid);
+		if (info) {
+			return info
+		} else {
+			return {
+				name: "RESTAURANT NOT FOUND"
+			}
+		}
 	} 
 
 	/*
 		getProductInfoFromId
 	*/
 	getProductInfoFromId = (productid) => {
-		return this.props.appstate.products.find(p => p.id === productid);
+		const info = this.props.appstate.products.find(p => p.id === productid);
+		if (info) {
+			return info
+		} else {
+			return {
+				name: "PRODUCT NOT FOUND"
+			}
+		}
 	} 
 
 	//------------------------------------------------------------------------------ render

@@ -84,20 +84,20 @@
 }
 
 
-.OrdersView .restaurantName {
+.OrdersView .resumeName {
     font-size: large;
     color: #6FFFE9;
 }
 
-.OrdersView .productsList {
+.OrdersView .resumeList {
     margin-bottom: 10px;
 }
 
-.OrdersView .productsList p span {
+.OrdersView .resumeList p span {
     margin-left: 10px;
 }
 
-.OrdersView .productsList p {
+.OrdersView .resumeList p {
     font-size: large;
     margin-bottom: 0;
 }

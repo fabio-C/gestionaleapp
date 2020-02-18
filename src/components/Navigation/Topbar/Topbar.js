@@ -32,7 +32,7 @@ const topbar = ( props ) => {
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
 						<NavLink className="nav-link" to="/" exact activeClassName="active">Ordini</NavLink>
-						<NavLink className="nav-link" to="/historical" exact activeClassName="active">Storici</NavLink>
+						<NavLink className="nav-link" to="/historical" exact activeClassName="active">Dati</NavLink>
 						<NavLink className="nav-link" to="/restaurants" exact activeClassName="active">Ristoranti</NavLink>
 						<NavLink className="nav-link" to="/products" exact activeClassName="active">Prodotti</NavLink>
 					</Nav>
