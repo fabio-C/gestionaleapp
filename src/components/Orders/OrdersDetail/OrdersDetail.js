@@ -65,7 +65,7 @@ const OrdersDetail = (props) => {
 				</Col>
 				<Col md={6} className="OrdersDetailButtons2"> 
 					<Button onClick={props.handleClickSave} disabled={!props.orderEdited}> Salva </Button> 
-					<Button className={print_classes} onClick={props.handleClickPrint} disabled={props.orderEdited || props.printLoading}> Stampa Fattura </Button> 
+					<Button className={print_classes} onClick={props.handleClickPrint} disabled={props.orderEdited || props.printLoading}> Stampa Bolla </Button> 
 				</Col> 
 			</Row>
 

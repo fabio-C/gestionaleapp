@@ -276,6 +276,8 @@ class Orders extends Component {
 			console.log("Print");
 			axios.get('https://europe-west2-gestionalethecircle.cloudfunctions.net/createOrderPDF?orderid=' + this.state.orderid + '&restaurantid=' + this.state.restaurant.id)
 	      	.then(res => {
+	      		console.log(res);
+	      		
 	      		if (res.data.status === "ok") {
 	      			window.open(res.data.url, '_blank').focus();
 	      		} else {

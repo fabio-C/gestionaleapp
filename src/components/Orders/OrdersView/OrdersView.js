@@ -90,7 +90,12 @@ const OrdersView = (props) => {
 
 				let productsList = [];
 
+				let restaurantsTotal = 0;
+
 				for (var i = 0; i < restaurant.products.length; i++) {
+
+					restaurantsTotal += restaurant.products[i].quantity;
+
 					productsList.push(
 						<p key={i + "_2"} name={props.getProductInfoFromId(restaurant.products[i].id).name}>
 							{props.getProductInfoFromId(restaurant.products[i].id).name}
@@ -110,6 +115,7 @@ const OrdersView = (props) => {
 					<Col md={12} key={index} name={restaurantName}>
 						<div className="resumeName">{restaurantName}</div>
 						<div className="resumeList">{productsList}</div>
+						<div className="resumeTotal"><span>Totale {restaurantsTotal}</span> </div>
 					</Col>
 				)
 			});
@@ -129,7 +135,7 @@ const OrdersView = (props) => {
 			props.products.forEach((product, index) => {
 
 				let restaurantList = [];
-
+				let productsTotal = 0;
 				let productFound = false;
 
 				for (var i = 0; i < props.order.restaurants.length; i++) {
@@ -138,6 +144,8 @@ const OrdersView = (props) => {
 						if (props.order.restaurants[i].products[j].id === product.id) {
 
 							productFound = true;
+
+							productsTotal += props.order.restaurants[i].products[j].quantity;
 
 							restaurantList.push(
 								<p key={i.toString() + j.toString()} name={props.getRestaurantInfoFromId(props.order.restaurants[i].id).name}>
@@ -161,6 +169,7 @@ const OrdersView = (props) => {
 						<Col md={12} key={index} name={product.name}>
 							<div className="resumeName">{product.name}</div>
 							<div className="resumeList">{restaurantList}</div>
+							<div className="resumeTotal"><span>Totale {productsTotal}</span></div>
 						</Col>
 					)	
 				}
@@ -172,7 +181,6 @@ const OrdersView = (props) => {
 			    if(a.props.name > b.props.name) { return 1; }
 			  	return 0;
 			});
-
 
 		}
 	}
